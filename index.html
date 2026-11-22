@@ -88,6 +88,34 @@ p { margin: 0; }
 .hist td.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
 .scroll-x { overflow-x: auto; }
 
+/* Code, figures, donation */
+.codegrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 8px; }
+.codebtn { min-height: 46px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font: 600 16px var(--font-num); cursor: pointer; }
+.codebtn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.codeinput { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.codeinput label { font-size: 14px; color: var(--muted); }
+.codeinput input { width: 120px; min-height: 40px; border: 1.5px solid var(--line); border-radius: 10px; padding: 0 12px; font: 600 15px var(--font-num); background: var(--surface); color: var(--ink); }
+.free-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); font-weight: 800; font-size: 13px; letter-spacing: 0.02em; }
+.anon { display: flex; gap: 12px; align-items: flex-start; background: var(--chip); border-radius: 12px; padding: 14px 16px; font-size: 14px; }
+.anon svg { width: 20px; height: 20px; flex: none; margin-top: 1px; }
+.donasi-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.donasi-head h2 { font-size: 18px; font-weight: 800; }
+.ewallet { display: flex; gap: 6px; flex-wrap: wrap; }
+.ewallet .chip { color: var(--ink); background: var(--chip); font-size: 13px; padding: 6px 12px; }
+.donasi-no { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.donasi-no .no { font-family: var(--font-num); font-size: 24px; font-weight: 600; letter-spacing: 0.02em; user-select: all; }
+.figtitle { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+.figseq { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.figseq .fig, .figopt .fig { width: 76px; height: 76px; color: var(--ink); }
+.figq { width: 76px; height: 76px; border: 2px dashed var(--line); border-radius: 6px; display: grid; place-items: center; font: 700 28px var(--font-num); color: var(--muted); }
+.opts.figgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.opt.figopt { flex-direction: column; align-items: center; gap: 8px; padding: 12px 8px; }
+.opt.figopt > span:last-child { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.figinline .fig { width: 52px; height: 52px; vertical-align: middle; color: var(--ink); }
+.rev-q .figseq .fig, .rev-q .figq { width: 52px; height: 52px; }
+.rev-q .figtitle { font-size: 15px; margin-bottom: 8px; }
+@media (max-width: 560px) { .opts.figgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .figseq .fig, .figq { width: 60px; height: 60px; } }
+
 /* Intro */
 .intro { max-width: 720px; margin: 0 auto; width: 100%; }
 .intro h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 800; letter-spacing: -0.02em; }
@@ -224,7 +252,7 @@ details.sim-rev .rev { border-color: var(--line); }
 
   const TESTS = {
     deret: {
-      name: 'Deret Angka', minutes: 30, target: 24,
+      name: 'Deret Angka', minutes: 30, target: 24, n: 30,
       desc: 'Tentukan angka atau huruf berikutnya pada setiap deret.',
       qs: [
         ['2, 6, 8, 24, 26, 78, …', ['79', '80', '82', '234', '240'], 1, '×3, +2 bergantian: 78 + 2 = 80'],
@@ -260,7 +288,7 @@ details.sim-rev .rev { border-color: var(--line); }
       ]
     },
     cerita: {
-      name: 'Soal Cerita Matematika', minutes: 25, target: 20,
+      name: 'Soal Cerita Matematika', minutes: 25, target: 20, n: 25,
       desc: 'Hitung tanpa kalkulator. Rumus yang dibutuhkan disebutkan di soal.',
       qs: [
         ['Rumus berat badan ideal bayi 0–12 bulan = (usia dalam bulan ÷ 2) + 4. Seorang bayi berusia 8 bulan. Berapa berat badan idealnya?', ['6 kg', '7 kg', '8 kg', '9 kg', '10 kg'], 2, '8 ÷ 2 + 4 = 8 kg'],
@@ -291,7 +319,7 @@ details.sim-rev .rev { border-color: var(--line); }
       ]
     },
     logika: {
-      name: 'Tes Logika', minutes: 20, target: 20,
+      name: 'Tes Logika', minutes: 20, target: 20, n: 25,
       desc: 'Jawab berdasarkan premis yang diberikan. Untuk soal benar-salah premis, nilai kebenarannya sesuai fakta umum.',
       qs: [
         ['Semua karyawan PT X wajib memakai helm di area produksi. Rudi adalah karyawan PT X yang sedang berada di area produksi. Jadi …', ['Rudi tidak wajib memakai helm', 'Rudi wajib memakai helm', 'Sebagian karyawan tidak memakai helm', 'Rudi adalah mandor', 'Tidak dapat ditarik kesimpulan'], 1, 'Semua karyawan wajib; Rudi karyawan, maka Rudi wajib memakai helm'],
@@ -321,8 +349,34 @@ details.sim-rev .rev { border-color: var(--line); }
         [BB + 'Semua segitiga memiliki empat sisi. Persegi adalah segitiga. Jadi, persegi memiliki empat sisi.', PREMIS, 3, 'Segitiga bersisi tiga, dan persegi bukan segitiga']
       ]
     },
+    penalaran: {
+      name: 'Logika Penalaran (Gambar)', minutes: 10, target: 8, n: 10,
+      desc: 'Perhatikan pola deret gambar, lalu pilih gambar yang melanjutkan pola tersebut.',
+      qs: null
+    },
+    analogi: {
+      name: 'Kemampuan Verbal (Analogi)', minutes: 10, target: 12, n: 15,
+      desc: 'Temukan hubungan pasangan kata pertama, lalu pilih padanan yang hubungannya sama.',
+      qs: [
+        ['Sayap : Burung = Sirip : …', ['Kucing', 'Ikan', 'Kuda', 'Anjing'], 1, 'Sayap alat gerak burung; sirip alat gerak ikan'],
+        ['Haus : Minum = Lapar : …', ['Tidur', 'Mandi', 'Makan', 'Lari'], 2, 'Haus diatasi dengan minum; lapar diatasi dengan makan'],
+        ['Mahkota : Raja = Toga : …', ['Wisudawan', 'Pilot', 'Petani', 'Montir'], 0, 'Mahkota dipakai raja; toga dipakai wisudawan'],
+        ['Uang : Dompet = Air : …', ['Selang', 'Keran', 'Selokan', 'Ember'], 3, 'Dompet wadah uang; ember wadah air'],
+        ['Perusahaan : Karyawan = Sekolah : …', ['Pengawas', 'Siswa', 'Ujian', 'Kelas'], 1, 'Karyawan anggota perusahaan; siswa anggota sekolah'],
+        ['Termometer : Suhu = Barometer : …', ['Angin', 'Hujan', 'Tekanan udara', 'Kelembapan'], 2, 'Termometer mengukur suhu; barometer mengukur tekanan udara'],
+        ['Pilot : Pesawat = Masinis : …', ['Kereta api', 'Rel', 'Stasiun', 'Penumpang'], 0, 'Pilot mengemudikan pesawat; masinis mengemudikan kereta api'],
+        ['Kayu : Meja = Benang : …', ['Jarum', 'Gunting', 'Penjahit', 'Kain'], 3, 'Kayu bahan meja; benang bahan kain'],
+        ['Merpati : Burung = Melati : …', ['Taman', 'Bunga', 'Harum', 'Putih'], 1, 'Merpati jenis burung; melati jenis bunga'],
+        ['Gram : Massa = Liter : …', ['Panjang', 'Waktu', 'Luas', 'Volume'], 3, 'Gram satuan massa; liter satuan volume'],
+        ['Dokter : Rumah sakit = Koki : …', ['Dapur', 'Pasar', 'Sawah', 'Bengkel'], 0, 'Dokter bekerja di rumah sakit; koki bekerja di dapur'],
+        ['Lebah : Madu = Ulat sutra : …', ['Daun', 'Kain', 'Sutra', 'Kupu-kupu'], 2, 'Lebah menghasilkan madu; ulat sutra menghasilkan sutra'],
+        ['Presiden : Negara = Lurah : …', ['Kota', 'Desa', 'Provinsi', 'Kecamatan'], 1, 'Presiden memimpin negara; lurah memimpin desa'],
+        ['Roda : Sepeda = Daun : …', ['Hijau', 'Ranting', 'Akar', 'Pohon'], 3, 'Roda bagian dari sepeda; daun bagian dari pohon'],
+        ['Panas : Dingin = Tinggi : …', ['Rendah', 'Besar', 'Jauh', 'Lebar'], 0, 'Panas lawan dingin; tinggi lawan rendah']
+      ]
+    },
     sinonim: {
-      name: 'Sinonim', minutes: 8, target: 24,
+      name: 'Sinonim', minutes: 8, target: 24, n: 30,
       desc: 'Pilih kata yang paling dekat artinya.',
       qs: [
         sin('Abrasi', ['Pengendapan', 'Pengikisan', 'Penimbunan', 'Pencemaran', 'Penguapan'], 1),
@@ -358,7 +412,7 @@ details.sim-rev .rev { border-color: var(--line); }
       ]
     },
     antonim: {
-      name: 'Antonim', minutes: 8, target: 24,
+      name: 'Antonim', minutes: 8, target: 24, n: 30,
       desc: 'Pilih kata yang paling berlawanan artinya. Waspadai opsi yang justru sinonimnya.',
       qs: [
         ant('Abstrak', ['Semu', 'Konkret', 'Maya', 'Khayal', 'Teori'], 1),
@@ -394,7 +448,262 @@ details.sim-rev .rev { border-color: var(--line); }
       ]
     }
   };
-  const ORDER = ['deret', 'cerita', 'logika', 'sinonim', 'antonim'];
+  const ORDER = ['deret', 'cerita', 'logika', 'penalaran', 'analogi', 'sinonim', 'antonim'];
+  // ===== Paket soal per kode: kode 01 = paket dasar, kode lain disusun dari pola dengan kunci yang dihitung =====
+  function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function makeRng(seed) {
+    const f = mulberry32(seed);
+    return {
+      f,
+      int: (a, b) => a + Math.floor(f() * (b - a + 1)),
+      pick: arr => arr[Math.floor(f() * arr.length)],
+      shuffle: arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(f() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+    };
+  }
+  const nf = n => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 2 });
+  const rp = n => 'Rp' + nf(n);
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const kg = v => nf(v) + ' kg', km = v => nf(v) + ' km', hari = v => nf(v) + ' hari', mnt = v => nf(v) + ' menit';
+  const hhmm = m => { m = ((m % 1440) + 1440) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + '.' + String(m % 60).padStart(2, '0'); };
+  const near = (ans, steps) => { const out = []; steps.forEach(s => { out.push(ans + s, ans - s); }); return out.filter(v => v > 0 && v !== ans); };
+  const seqQ = (t, tail) => t.join(', ') + (tail || ', …');
+  function pack(R, correct, cands, nd) {
+    nd = nd || 4;
+    const c = String(correct), seen = new Set([c]), ds = [];
+    for (const x of R.shuffle(cands)) {
+      const s = String(x);
+      if (s && s !== 'NaN' && s.indexOf('undefined') < 0 && s.indexOf('NaN') < 0 && !seen.has(s)) { seen.add(s); ds.push(s); }
+      if (ds.length === nd) break;
+    }
+    if (ds.length < nd) return null;
+    const opts = R.shuffle([c].concat(ds));
+    return [opts, opts.indexOf(c)];
+  }
+  function build(R, fn, nd, flag) {
+    for (let t = 0; t < 40; t++) { const g = fn(R); if (!g) continue; const p = pack(R, g.a, g.c, nd); if (p) return flag ? [g.q, p[0], p[1], g.e, flag] : [g.q, p[0], p[1], g.e]; }
+    return null;
+  }
+  function genSeq(R, fns, n, nd, flag) {
+    const out = []; let pool = [], guard = 0;
+    while (out.length < n && guard++ < n * 20) {
+      if (!pool.length) pool = R.shuffle(fns.map((_, i) => i));
+      const q = build(R, fns[pool.pop()], nd, flag);
+      if (q) out.push(q);
+    }
+    return out;
+  }
+
+  const NAMA = ['Andi', 'Budi', 'Sinta', 'Rina', 'Doni', 'Fajar', 'Lestari', 'Maya', 'Rudi', 'Wulan', 'Yoga', 'Tono', 'Dewi', 'Agus', 'Nina', 'Hendra', 'Putri', 'Bayu'];
+  const KOTA = ['Bandung', 'Cirebon', 'Jakarta', 'Bogor', 'Serang', 'Cilegon', 'Semarang', 'Solo', 'Surabaya', 'Malang', 'Yogyakarta', 'Purwakarta', 'Sukabumi', 'Tasikmalaya', 'Garut'];
+  const two = (R, arr) => { const a = R.pick(arr); let b = R.pick(arr); while (b === a) b = R.pick(arr); return [a, b]; };
+
+  // ---- Deret angka: 18 pola ----
+  const DG = [
+    R => { const dec = R.f() < 0.3, d = R.pick([2, 3, 4, 5, 6, 7, 8, 9, 11, 12]), a = dec ? R.int(70, 130) : R.int(2, 40), s = dec ? -d : d, t = [0, 1, 2, 3, 4].map(i => a + s * i), ans = a + s * 5; return { q: seqQ(t), a: ans, c: near(ans, [1, 2, d + 1, 10]), e: (s > 0 ? 'Selalu bertambah ' : 'Selalu berkurang ') + d + ': ' + t[4] + (s > 0 ? ' + ' : ' − ') + d + ' = ' + ans }; },
+    R => { const r = R.pick([2, 3]), a = r === 3 ? R.int(1, 4) : R.int(1, 7), t = [0, 1, 2, 3, 4].map(i => a * Math.pow(r, i)), ans = a * Math.pow(r, 5); return { q: seqQ(t), a: ans, c: near(ans, [r, a, 2]).concat([ans + t[4], t[4] * (r + 1)]), e: 'Setiap suku dikali ' + r + ': ' + t[4] + ' × ' + r + ' = ' + ans }; },
+    R => { const r = R.pick([2, 3]), b = R.int(1, 6), t = [5, 4, 3, 2, 1].map(i => b * Math.pow(r, i)); return { q: seqQ(t), a: b, c: near(b, [1, 2, 3]).concat([b * r + 1, b + r, 0]), e: 'Setiap suku dibagi ' + r + ': ' + t[4] + ' ÷ ' + r + ' = ' + b }; },
+    R => { const a = R.int(1, 20), d0 = R.int(1, 6), inc = R.pick([1, 2, 3]), t = [a]; for (let i = 0; i < 6; i++) t.push(t[i] + d0 + inc * i); const ans = t[6]; return { q: seqQ(t.slice(0, 6)), a: ans, c: near(ans, [1, 2, inc + 1, 5]), e: 'Selisihnya bertambah ' + inc + ': ' + [0, 1, 2, 3, 4, 5].map(i => '+' + (d0 + inc * i)).join(', ') }; },
+    R => { const k = R.pick([2, 3]), m = R.int(1, 6), a = R.int(1, 5), t = [a]; for (let i = 0; i < 6; i++) t.push(i % 2 === 0 ? t[i] * k : t[i] + m); const ans = t[6]; return { q: seqQ(t.slice(0, 6)), a: ans, c: near(ans, [1, m + 1, 2 * m]).concat([t[5] * k, t[5] + 2 * m]), e: '×' + k + ', +' + m + ' bergantian: ' + t[5] + ' + ' + m + ' = ' + ans }; },
+    R => { const p = R.int(4, 12), q = R.int(1, p - 1), a = R.int(10, 60), t = [a]; for (let i = 0; i < 6; i++) t.push(i % 2 === 0 ? t[i] + p : t[i] - q); const ans = t[6]; return { q: seqQ(t.slice(0, 6)), a: ans, c: near(ans, [1, 2, p, q + 1]).concat([t[5] + p]), e: '+' + p + ', −' + q + ' bergantian: ' + t[5] + ' − ' + q + ' = ' + ans }; },
+    R => { const a1 = R.int(1, 30), s1 = R.pick([2, 3, 4, 5, 10]), s2 = R.pick([-1, -2, -3, -5, 1, 2, 3]), b1 = s2 < 0 ? R.int(30, 90) : R.int(1, 40), A = i => a1 + s1 * i, B = i => b1 + s2 * i, t = []; for (let i = 0; i < 4; i++) t.push(A(i), B(i)); return { q: seqQ(t, ', …, …'), a: A(4) + ', ' + B(4), c: [(A(4) + 1) + ', ' + B(4), A(4) + ', ' + (B(4) + 1), B(4) + ', ' + A(4), A(5) + ', ' + B(5), (A(4) - 1) + ', ' + (B(4) - 1), A(4) + ', ' + B(3)], e: 'Dua deret selang-seling: suku ganjil ' + (s1 > 0 ? '+' : '−') + Math.abs(s1) + ', suku genap ' + (s2 > 0 ? '+' : '−') + Math.abs(s2) }; },
+    R => { const x1 = R.int(1, 6), x2 = R.int(x1, 9), t = [x1, x2]; while (t.length < 8) t.push(t[t.length - 1] + t[t.length - 2]); const ans = t[7]; return { q: seqQ(t.slice(0, 7)), a: ans, c: near(ans, [1, 2, t[4], 10]).concat([t[6] * 2]), e: 'Setiap suku = jumlah dua suku sebelumnya: ' + t[5] + ' + ' + t[6] + ' = ' + ans }; },
+    R => { const c = R.pick([0, 0, 1, -1, 2, 3, -2, 5]), n0 = c < 0 ? R.int(2, 6) : R.int(1, 6), t = [0, 1, 2, 3, 4].map(i => Math.pow(n0 + i, 2) + c), n = n0 + 5, ans = n * n + c; return { q: seqQ(t), a: ans, c: near(ans, [1, 2, 2 * n - 1, n]), e: c === 0 ? 'Bilangan kuadrat: ' + n + '² = ' + ans : 'n² ' + (c > 0 ? '+ ' : '− ') + Math.abs(c) + ': ' + n + '² ' + (c > 0 ? '+ ' : '− ') + Math.abs(c) + ' = ' + ans }; },
+    R => { const n0 = R.int(1, 3), c = R.pick([0, 0, 1, 2]), t = [0, 1, 2, 3, 4].map(i => Math.pow(n0 + i, 3) + c), n = n0 + 5, ans = Math.pow(n, 3) + c; return { q: seqQ(t), a: ans, c: near(ans, [1, n, n * n, 10]), e: (c ? 'n³ + ' + c : 'Bilangan kubik') + ': ' + n + '³' + (c ? ' + ' + c : '') + ' = ' + ans }; },
+    R => { const P = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59], s = R.int(0, 7), t = P.slice(s, s + 6), ans = P[s + 6]; return { q: seqQ(t), a: ans, c: [ans - 1, ans + 1, ans + 2, ans - 2, P[s + 7], ans + 4].filter(v => v > 0), e: 'Bilangan prima berurutan' }; },
+    R => { const a = R.int(1, 3), t = [a]; for (let i = 2; i <= 5; i++) t.push(t[t.length - 1] * i); const ans = t[4]; return { q: seqQ(t.slice(0, 4)), a: ans, c: near(ans, [t[3], 12, 24]).concat([t[3] * 4, t[3] * 6]), e: '×2, ×3, ×4, ×5: ' + t[3] + ' × 5 = ' + ans }; },
+    R => { const st = R.int(2, 4), s0 = R.int(0, 25 - 5 * st), t = [0, 1, 2, 3, 4].map(i => ABC[s0 + st * i]), ai = s0 + st * 5, ans = ABC[ai]; return { q: seqQ(t), a: ans, c: [ai - 1, ai + 1, ai - 2, ai + 2, ai + 3, ai - 3].filter(i => i >= 0 && i < 26).map(i => ABC[i]), e: 'Maju ' + st + ' huruf: ' + t[4] + ' + ' + st + ' = ' + ans }; },
+    R => { const s0 = R.int(0, 10), t = [0, 1, 3, 6, 10].map(o => ABC[s0 + o]), ai = s0 + 15, ans = ABC[ai]; return { q: seqQ(t), a: ans, c: [ai - 1, ai + 1, ai - 2, ai + 2, ai - 3].filter(i => i >= 0 && i < 26).map(i => ABC[i]), e: 'Lompatan bertambah: +1, +2, +3, +4, +5 huruf' }; },
+    R => { const a = R.int(3, 30), d = R.pick([3, 4, 6, 7, 8, 9, 12, 15]), t = [0, 1, 2, 3, 4].map(i => a + d * i), ans = t[2]; return { q: t[0] + ', ' + t[1] + ', …, ' + t[3] + ', ' + t[4], a: ans, c: near(ans, [1, 2, d - 1, 10]), e: 'Selisih tetap +' + d + ': ' + t[1] + ' + ' + d + ' = ' + ans }; },
+    R => { const a = R.int(1, 5), r = R.pick([2, 3]), t = [0, 1, 2, 3, 4].map(i => a * Math.pow(r, i)), ans = t[2]; return { q: t[0] + ', ' + t[1] + ', …, ' + t[3] + ', ' + t[4], a: ans, c: near(ans, [1, 2, a + 1, r + 1]).concat([t[1] + t[3]]), e: 'Dikali ' + r + ': ' + t[1] + ' × ' + r + ' = ' + ans }; },
+    R => { const k = R.pick([2, 3]), a = R.int(3, 8), m = R.int(1, a - 1), t = [a]; for (let i = 0; i < 6; i++) t.push(i % 2 === 0 ? t[i] * k : t[i] - m); const ans = t[6]; return { q: seqQ(t.slice(0, 6)), a: ans, c: near(ans, [1, m + 1, 2]).concat([t[5] * k, t[5] + m]), e: '×' + k + ', −' + m + ' bergantian: ' + t[5] + ' − ' + m + ' = ' + ans }; },
+    R => { const k = R.pick([2, 3, 4, 5, 6]), a = R.int(15 * k + 20, 15 * k + 120), t = [a]; for (let i = 1; i <= 5; i++) t.push(t[i - 1] - k * i); const ans = t[5]; return { q: seqQ(t.slice(0, 5)), a: ans, c: near(ans, [k, 2 * k, 1]).concat([t[4] - k * 4]), e: 'Pengurangnya kelipatan ' + k + ': ' + [1, 2, 3, 4, 5].map(i => '−' + k * i).join(', ') }; }
+  ];
+
+  // ---- Soal cerita: 29 pola ----
+  const CG = [
+    R => { const u = R.pick([2, 4, 6, 8, 10, 12]), n = R.pick(NAMA), b = u / 2 + 4; return { q: 'Rumus berat badan ideal bayi 0–12 bulan = (usia dalam bulan ÷ 2) + 4. Bayi ' + n + ' berusia ' + u + ' bulan. Berapa berat badan idealnya?', a: kg(b), c: near(b, [1, 2, 3]).concat([u + 4, u * 2 + 4]).map(kg), e: u + ' ÷ 2 + 4 = ' + b + ' kg' }; },
+    R => { const u = R.int(1, 10), n = R.pick(NAMA), b = u * 2 + 8; return { q: 'Rumus berat badan ideal anak 1–10 tahun = (usia dalam tahun × 2) + 8. ' + n + ' berusia ' + u + ' tahun. Berapa berat badan idealnya?', a: kg(b), c: near(b, [1, 2, 4]).concat([u + 8, u * 8 + 2]).map(kg), e: u + ' × 2 + 8 = ' + b + ' kg' }; },
+    R => { const tb = R.pick([150, 155, 160, 165, 170, 175, 180, 185]), n = R.pick(NAMA), b = Math.round((tb - 100) * 9) / 10; return { q: 'Rumus berat badan ideal dewasa = (tinggi badan dalam cm − 100) × 90%. Tinggi badan ' + n + ' ' + tb + ' cm. Berapa berat badan idealnya?', a: kg(b), c: [tb - 100, b + 4.5, b - 4.5, b + 9, b - 2, b + 2].filter(v => v > 0).map(kg), e: '(' + tb + ' − 100) × 0,9 = ' + nf(b) + ' kg' }; },
+    R => { const tb = R.pick([150, 155, 160, 165, 170, 175, 180, 185]), n = R.pick(NAMA), b = Math.round((tb - 100) * 9) / 10; return { q: 'Rumus berat badan ideal dewasa = (tinggi badan dalam cm − 100) × 90%. Berat badan ideal ' + n + ' adalah ' + nf(b) + ' kg. Berapa tinggi badannya?', a: tb + ' cm', c: [tb - 5, tb + 5, tb - 10, tb + 10, Math.round(b + 100)].map(v => nf(v) + ' cm'), e: nf(b) + ' ÷ 0,9 = ' + (tb - 100) + ' → ' + (tb - 100) + ' + 100 = ' + tb + ' cm' }; },
+    R => { const v = R.pick([40, 50, 60, 70, 80]), t = R.pick([1.5, 2, 2.5, 3, 3.5, 4]), [k1, k2] = two(R, KOTA), d = v * t; return { q: 'Sebuah bus melaju dari ' + k1 + ' ke ' + k2 + ' dengan kecepatan rata-rata ' + v + ' km/jam selama ' + nf(t) + ' jam. Berapa jarak yang ditempuh?', a: km(d), c: near(d, [10, 20, 30, 40]).map(km), e: v + ' × ' + nf(t) + ' = ' + d + ' km' }; },
+    R => { const v = R.pick([40, 45, 50, 55, 60, 65, 70, 75, 80]), t = R.int(2, 5), d = v * t, n = R.pick(NAMA); return { q: n + ' menempuh jarak ' + d + ' km dalam ' + t + ' jam. Berapa kecepatan rata-ratanya?', a: v + ' km/jam', c: near(v, [5, 10, 15, 20]).map(x => x + ' km/jam'), e: d + ' ÷ ' + t + ' = ' + v + ' km/jam' }; },
+    R => { const v = R.pick([40, 50, 60, 80, 90]), t = R.pick([1.5, 2, 2.5, 3, 4]), d = v * t, [k1, k2] = two(R, KOTA); return { q: 'Jarak ' + k1 + ' ke ' + k2 + ' adalah ' + d + ' km. Jika ditempuh dengan mobil berkecepatan ' + v + ' km/jam, berapa lama perjalanannya?', a: mnt(t * 60), c: near(t * 60, [20, 30, 60, 40]).map(mnt), e: d + ' ÷ ' + v + ' = ' + nf(t) + ' jam = ' + t * 60 + ' menit' }; },
+    R => { const s = R.int(5, 10) * 60 + R.pick([0, 10, 15, 20, 30, 40, 45, 50]), dur = R.int(1, 4) * 60 + R.pick([15, 20, 25, 30, 35, 40, 45, 50, 55]), n = R.pick(NAMA), e1 = s + dur; return { q: n + ' berangkat pukul ' + hhmm(s) + '. Perjalanannya memakan waktu ' + Math.floor(dur / 60) + ' jam ' + dur % 60 + ' menit. Pukul berapa ' + n + ' tiba?', a: hhmm(e1), c: [e1 + 10, e1 - 10, e1 + 60, e1 - 60, e1 + 30, e1 - 30].map(hhmm), e: hhmm(s) + ' + ' + Math.floor(dur / 60) + ' jam ' + dur % 60 + ' menit = ' + hhmm(e1) }; },
+    R => { const u = R.pick([['lusin', 12], ['kodi', 20]]), p = R.pick([1500, 2000, 2500, 3000, 3500, 4000, 5000]), it = R.pick(['pensil', 'buku tulis', 'penghapus', 'gantungan kunci', 'pasang kaus kaki']), n = R.int(3, 9); return { q: 'Harga 1 ' + u[0] + ' ' + it + ' adalah ' + rp(p * u[1]) + '. Berapa harga ' + n + ' ' + it + '?', a: rp(p * n), c: near(p * n, [p, 500, 1000, 2 * p]).map(rp), e: '1 ' + u[0] + ' = ' + u[1] + ' buah → ' + rp(p * u[1]) + ' ÷ ' + u[1] + ' = ' + rp(p) + ' per buah; × ' + n + ' = ' + rp(p * n) }; },
+    R => { const g = R.pick([3000000, 3500000, 4000000, 4500000, 5000000, 6000000]), pc = R.pick([10, 15, 20, 25, 30]), n = R.pick(NAMA), a = g * pc / 100; return { q: 'Gaji ' + n + ' ' + rp(g) + ' per bulan dan ' + pc + '% di antaranya ditabung. Berapa tabungan ' + n + ' setiap bulan?', a: rp(a), c: near(a, [g / 20, g / 10, 50000, 100000]).map(rp), e: pc + '% × ' + rp(g) + ' = ' + rp(a) }; },
+    R => { const h = R.int(2, 12) * 50000, d = R.pick([10, 15, 20, 25, 30, 40]), it = R.pick(['tas', 'sepatu', 'jaket', 'helm', 'jam tangan', 'kemeja']), pay = h * (100 - d) / 100, cut = h * d / 100; return { q: 'Sebuah ' + it + ' seharga ' + rp(h) + ' mendapat diskon ' + d + '%. Berapa yang harus dibayar?', a: rp(pay), c: [cut, pay + 5000, pay - 5000, pay + 10000, pay - 10000, h - d * 1000].filter(v => v > 0).map(rp), e: rp(h) + ' × ' + (100 - d) + '% = ' + rp(pay) }; },
+    R => { const h = R.pick([200000, 300000, 400000, 500000, 800000, 1000000]), d1 = R.pick([10, 20, 25]), d2 = R.pick([10, 20]), pay = h * (100 - d1) * (100 - d2) / 10000, wrong = h * (100 - d1 - d2) / 100; return { q: 'Harga sebuah barang ' + rp(h) + '. Barang itu didiskon ' + d1 + '%, lalu didiskon lagi ' + d2 + '% dari harga setelah diskon pertama. Berapa harga akhirnya?', a: rp(pay), c: [wrong, pay + 10000, pay - 10000, h * (100 - d1) / 100, pay + 20000].map(rp), e: rp(h) + ' × ' + (100 - d1) + '% × ' + (100 - d2) + '% = ' + rp(pay) }; },
+    R => { const big = R.f() < 0.5, b = R.int(4, 30) * (big ? 1000000 : 10000), p = R.pick([10, 20, 25, 30, 40, 50]), j = b * (100 + p) / 100, it = big ? R.pick(['motor bekas', 'mobil bekas', 'sebidang tanah']) : R.pick(['sepeda', 'ponsel bekas', 'lemari']); return { q: 'Pak ' + R.pick(['Budi', 'Rudi', 'Agus', 'Hendra', 'Tono']) + ' membeli ' + it + ' seharga ' + rp(b) + ', lalu menjualnya ' + rp(j) + '. Berapa persen keuntungannya?', a: p + '%', c: near(p, [5, 10, 15]).concat([Math.round((j - b) / j * 100)]).map(x => x + '%'), e: '(' + rp(j) + ' − ' + rp(b) + ') ÷ ' + rp(b) + ' × 100% = ' + p + '%' }; },
+    R => { const b = R.int(4, 30) * 100000, p = R.pick([10, 20, 25, 30, 40]), j = b * (100 - p) / 100; return { q: 'Seorang pedagang membeli barang seharga ' + rp(b) + ' dan terpaksa menjualnya ' + rp(j) + '. Berapa persen kerugiannya?', a: p + '%', c: near(p, [5, 10, 15]).concat([100 - p]).map(x => x + '%'), e: '(' + rp(b) + ' − ' + rp(j) + ') ÷ ' + rp(b) + ' × 100% = ' + p + '%' }; },
+    R => { const p1 = R.pick([4, 6, 8, 10, 12, 15]), h1 = R.pick([12, 15, 18, 20, 24, 30, 36, 40, 60]), W = p1 * h1, opts = [2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, 30].filter(x => x !== p1 && W % x === 0 && W / x !== h1); if (!opts.length) return null; const p2 = R.pick(opts), h2 = W / p2, job = R.pick(['membangun sebuah rumah', 'mengecat gedung sekolah', 'menyelesaikan pesanan seragam', 'memanen padi di sawah', 'memasang instalasi pipa']); return { q: 'Untuk ' + job + ' dibutuhkan waktu ' + h1 + ' hari jika dikerjakan ' + p1 + ' orang. Berapa hari jika dikerjakan ' + p2 + ' orang dengan kecepatan kerja yang sama?', a: hari(h2), c: near(h2, [1, 2, 3, 5]).concat([h1 * p2 / p1]).filter(Number.isInteger).map(hari), e: p1 + ' × ' + h1 + ' = ' + p2 + ' × h → h = ' + h2 + ' hari' }; },
+    R => { const s = R.pick([[3, 6, 2], [4, 12, 3], [6, 12, 4], [10, 15, 6], [12, 24, 8], [20, 30, 12], [15, 30, 10], [8, 24, 6], [6, 3, 2], [12, 4, 3]]), [n1, n2] = two(R, NAMA), u = R.pick(['jam', 'hari']); return { q: n1 + ' dapat menyelesaikan sebuah pekerjaan dalam ' + s[0] + ' ' + u + ', sedangkan ' + n2 + ' dalam ' + s[1] + ' ' + u + '. Jika bekerja bersama, berapa ' + u + ' pekerjaan itu selesai?', a: s[2] + ' ' + u, c: [(s[0] + s[1]) / 2, s[0] + s[1], Math.abs(s[0] - s[1]), s[2] + 1, s[2] - 1, s[2] + 2].filter(v => Number.isInteger(v) && v > 0).map(v => v + ' ' + u), e: '1/' + s[0] + ' + 1/' + s[1] + ' = 1/' + s[2] + ' → ' + s[2] + ' ' + u }; },
+    R => { const k = R.pick([2, 3, 4]), an = R.int(6, 15), S2 = an * (k + 1), askAyah = R.f() < 0.5, n = R.pick(NAMA), ans = askAyah ? an * k : an; return { q: 'Umur ayah ' + n + ' ' + k + ' kali umur ' + n + '. Jumlah umur mereka ' + S2 + ' tahun. Berapa umur ' + (askAyah ? 'ayah ' + n : n) + '?', a: ans + ' tahun', c: [an, an * k, an + 2, an * k + 2, S2 / 2, an * (k - 1), ans - 3].filter(v => Number.isInteger(v) && v > 0).map(v => v + ' tahun'), e: 'Umur ' + n + ' = x, ayah = ' + k + 'x; ' + (k + 1) + 'x = ' + S2 + ' → x = ' + an + (askAyah ? '; ayah = ' + an * k + ' tahun' : ' tahun') }; },
+    R => { const n = R.pick([4, 5, 6]), a1 = R.int(60, 80), d = R.int(1, 4), nw = (n + 1) * (a1 + d) - n * a1; return { q: 'Rata-rata nilai ' + n + ' siswa adalah ' + a1 + '. Setelah seorang siswa baru bergabung, rata-ratanya menjadi ' + (a1 + d) + '. Berapa nilai siswa baru itu?', a: nw, c: near(nw, [1, 2, d + 1, 5]).concat([a1 + d * 2]), e: (n + 1) + ' × ' + (a1 + d) + ' − ' + n + ' × ' + a1 + ' = ' + nw }; },
+    R => { const r = R.pick([[2, 3, 5], [1, 2, 3], [3, 4, 5], [1, 3, 4], [2, 5, 3], [4, 5, 6]]), k = R.int(3, 12), it = R.pick(['kelereng', 'permen', 'buku', 'kartu']), nm = R.shuffle(NAMA).slice(0, 3), sum = r[0] + r[1] + r[2], i = R.int(0, 2), ans = r[i] * k; return { q: cap(it) + ' milik ' + nm[0] + ', ' + nm[1] + ', dan ' + nm[2] + ' berbanding ' + r.join(' : ') + '. Jumlah seluruhnya ' + sum * k + '. Berapa ' + it + ' milik ' + nm[i] + '?', a: ans, c: r.map(v => v * k).concat([ans + k, ans - k, ans + 2 * k]).filter(v => Number.isInteger(v) && v > 0), e: r[i] + '/' + sum + ' × ' + sum * k + ' = ' + ans }; },
+    R => { const s = R.pick([100000, 200000, 250000, 500000, 1000000]), cm = R.int(2, 9), k = s * cm / 100000, [k1, k2] = two(R, KOTA); return { q: 'Skala peta 1 : ' + nf(s) + '. Jarak ' + k1 + ' ke ' + k2 + ' di peta ' + cm + ' cm. Berapa jarak sebenarnya?', a: km(k), c: [k * 10, k / 10, k + cm, k * 2, k + 5].filter(v => v > 0).map(km), e: cm + ' × ' + nf(s) + ' = ' + nf(s * cm) + ' cm = ' + nf(k) + ' km' }; },
+    R => { const p = R.int(8, 25), l = R.int(4, p - 1), luas = R.f() < 0.5, ans = luas ? p * l : 2 * (p + l), u = luas ? ' m²' : ' m'; return { q: 'Sebuah lahan berbentuk persegi panjang dengan panjang ' + p + ' m dan lebar ' + l + ' m. Berapa ' + (luas ? 'luasnya' : 'kelilingnya') + '?', a: ans + u, c: [p * l, 2 * (p + l), p + l, ans + 2, ans - 2, ans + 10].filter(v => v !== ans && v > 0).map(v => v + u), e: luas ? p + ' × ' + l + ' = ' + ans + ' m²' : '2 × (' + p + ' + ' + l + ') = ' + ans + ' m' }; },
+    R => { if (R.f() < 0.5) { const kml = R.pick([10, 12, 14, 15, 20]), L = R.int(5, 25), d = kml * L; return { q: 'Sebuah mobil menghabiskan 1 liter bensin untuk ' + kml + ' km. Berapa liter bensin untuk perjalanan ' + d + ' km?', a: L + ' liter', c: near(L, [1, 2, 3, 5]).map(v => v + ' liter'), e: d + ' ÷ ' + kml + ' = ' + L + ' liter' }; } const kml = R.pick([35, 40, 45, 50]), L = R.int(2, 9), d = kml * L; return { q: 'Sebuah motor menempuh ' + kml * 3 + ' km dengan 3 liter bensin. Berapa km yang dapat ditempuh dengan ' + L + ' liter?', a: km(d), c: near(d, [kml, 10, 2 * kml, 5]).map(km), e: kml * 3 + ' ÷ 3 = ' + kml + ' km per liter; × ' + L + ' = ' + d + ' km' }; },
+    R => { const ph = R.pick([30, 40, 45, 50, 60, 75, 80, 120]), j1 = R.pick([4, 6, 8]), j2 = R.int(2, 7), ans = ph * j2; if (j1 === j2) return null; return { q: 'Sebuah lini produksi menghasilkan ' + nf(ph * j1) + ' unit dalam ' + j1 + ' jam. Berapa unit yang dihasilkan dalam ' + j2 + ' jam dengan kecepatan yang sama?', a: nf(ans) + ' unit', c: near(ans, [ph, 10, 2 * ph, 20]).map(v => nf(v) + ' unit'), e: nf(ph * j1) + ' ÷ ' + j1 + ' = ' + ph + ' unit per jam; × ' + j2 + ' = ' + nf(ans) }; },
+    R => { const m = R.int(1, 10) * 1000000, r = R.pick([5, 6, 8, 10, 12]), y = R.pick([1, 2, 3]), bunga = m * r * y / 100, tot = m + bunga; return { q: 'Uang ' + rp(m) + ' ditabung dengan bunga tunggal ' + r + '% per tahun. Berapa total uang setelah ' + y + ' tahun?', a: rp(tot), c: [m + bunga / y, m + bunga * 2, tot + 50000, tot - 50000, bunga, m + m * r / 100 * (y + 1)].filter(v => v > 0).map(rp), e: 'Bunga = ' + r + '% × ' + rp(m) + ' × ' + y + ' = ' + rp(bunga) + '; total ' + rp(tot) }; },
+    R => { const F = R.pick([['1/4', '2/5', 7, 20], ['1/3', '1/4', 5, 12], ['1/2', '1/5', 3, 10], ['1/6', '1/2', 2, 6], ['1/5', '1/2', 3, 10]]), k = R.int(2, 8), T = F[3] * k, rem = F[2] * k, cr = R.pick([['jagung', 'cabai', 'tomat'], ['padi', 'singkong', 'kacang'], ['sawi', 'bayam', 'kangkung']]); return { q: 'Sebuah kebun ' + F[0] + ' bagiannya ditanami ' + cr[0] + ', ' + F[1] + ' bagian ditanami ' + cr[1] + ', dan sisanya seluas ' + rem + ' m² ditanami ' + cr[2] + '. Berapa luas kebun seluruhnya?', a: T + ' m²', c: [T + F[3], T - F[3], rem * 2, T * 2, rem + F[3], T + 2 * F[3]].filter(v => v > 0 && v !== T).map(v => v + ' m²'), e: 'Sisa = 1 − ' + F[0] + ' − ' + F[1] + ' = ' + F[2] + '/' + F[3] + '; ' + rem + ' ÷ ' + F[2] + '/' + F[3] + ' = ' + T + ' m²' }; },
+    R => { const v1 = R.pick([40, 50, 60, 70, 80]), v2 = R.pick([30, 40, 50, 60]), h = R.pick([1, 1.5, 2, 2.5, 3]), D = (v1 + v2) * h, st = R.pick([6, 7, 8, 9]) * 60, [k1, k2] = two(R, KOTA), m = st + h * 60; return { q: 'Jarak ' + k1 + ' dan ' + k2 + ' adalah ' + D + ' km. Pukul ' + hhmm(st) + ', A berangkat dari ' + k1 + ' ke ' + k2 + ' dengan kecepatan ' + v1 + ' km/jam, dan B dari ' + k2 + ' ke ' + k1 + ' dengan kecepatan ' + v2 + ' km/jam. Pukul berapa mereka bertemu?', a: hhmm(m), c: [m + 30, m - 30, m + 60, m - 60, m + 15].map(hhmm), e: D + ' ÷ (' + v1 + ' + ' + v2 + ') = ' + nf(h) + ' jam → pukul ' + hhmm(m) }; },
+    R => { const N = R.int(5, 15) * 40, p = R.pick([60, 70, 75, 80, 85, 90]), hadir = N * p / 100, absen = N - hadir, askAbs = R.f() < 0.6, ans = askAbs ? absen : hadir; return { q: 'Dari ' + N + ' karyawan, ' + p + '% hadir dalam rapat. Berapa karyawan yang ' + (askAbs ? 'tidak hadir' : 'hadir') + '?', a: ans, c: [askAbs ? hadir : absen, ans + 10, ans - 10, ans + 20, ans - 20].filter(v => v > 0), e: (askAbs ? (100 - p) : p) + '% × ' + N + ' = ' + ans }; },
+    R => { const L = R.pick([60, 90, 120, 150, 180, 240]), b = R.pick([1.5, 0.5, 0.25]), n = L / b, it = R.pick(['minyak goreng', 'air mineral', 'sirup']); return { q: 'Sebuah drum berisi ' + L + ' liter ' + it + '. Isinya dituang ke botol berukuran ' + nf(b) + ' liter. Berapa botol yang dibutuhkan?', a: nf(n) + ' botol', c: near(n, [10, 20, 5, 40]).map(v => nf(v) + ' botol'), e: L + ' ÷ ' + nf(b) + ' = ' + nf(n) + ' botol' }; },
+    R => { const h = R.int(4, 20) * 1000, p = R.pick([10, 15, 20, 25, 50]), nh = h * (100 + p) / 100, it = R.pick(['beras per kg', 'gula per kg', 'telur per kg', 'minyak goreng per liter']); return { q: 'Harga ' + it + ' naik dari ' + rp(h) + ' menjadi ' + rp(nh) + '. Berapa persen kenaikannya?', a: p + '%', c: near(p, [5, 10, 15]).concat([Math.round((nh - h) / nh * 100)]).map(v => v + '%'), e: '(' + rp(nh) + ' − ' + rp(h) + ') ÷ ' + rp(h) + ' × 100% = ' + p + '%' }; }
+  ];
+
+  // ---- Logika ----
+  const TDK = 'Tidak dapat ditarik kesimpulan';
+  const SY = [['karyawan bagian produksi', 'memakai sepatu keselamatan'], ['dokter di rumah sakit itu', 'berseragam putih'], ['siswa kelas unggulan', 'rajin membaca'], ['atlet nasional', 'berlatih setiap hari'], ['pilot maskapai itu', 'memiliki lisensi terbang'], ['perawat di klinik itu', 'teliti'], ['teknisi lapangan', 'memakai helm'], ['guru di sekolah itu', 'sabar'], ['manajer perusahaan itu', 'mengikuti rapat bulanan'], ['mahasiswa teknik', 'belajar kalkulus'], ['anggota paduan suara', 'pandai bernyanyi'], ['petani di desa itu', 'bangun pagi'], ['peserta pelatihan', 'membawa laptop'], ['operator mesin', 'mengikuti pelatihan K3']];
+  const WG = ['peserta seminar', 'warga kompleks itu', 'anggota klub olahraga', 'penumpang bus itu', 'tamu hotel', 'pengunjung pameran'];
+  const NOP = [['karyawan pabrik itu', 'merokok di area produksi'], ['pilot', 'minum alkohol sebelum terbang'], ['peserta ujian', 'membawa ponsel ke ruang ujian'], ['perawat jaga', 'meninggalkan pasien tanpa pengganti'], ['sopir bus itu', 'menggunakan ponsel saat menyetir'], ['operator', 'membuka panel listrik tanpa izin']];
+  const COND = [['hujan turun', 'jalan menjadi licin', 'hujan tidak turun', 'jalan tidak licin'], ['listrik padam', 'mesin produksi berhenti', 'listrik tidak padam', 'mesin produksi tidak berhenti'], ['Andi rajin belajar', 'Andi lulus ujian', 'Andi tidak rajin belajar', 'Andi tidak lulus ujian'], ['harga BBM naik', 'ongkos angkut naik', 'harga BBM tidak naik', 'ongkos angkut tidak naik'], ['alarm kebakaran berbunyi', 'karyawan berkumpul di titik aman', 'alarm kebakaran tidak berbunyi', 'karyawan tidak berkumpul di titik aman'], ['tekanan pompa turun', 'operator memeriksa saringan', 'tekanan pompa tidak turun', 'operator tidak memeriksa saringan'], ['stok bahan baku habis', 'produksi dihentikan', 'stok bahan baku tidak habis', 'produksi tidak dihentikan'], ['Sinta datang terlambat', 'Sinta mendapat teguran', 'Sinta tidak datang terlambat', 'Sinta tidak mendapat teguran']];
+  const CHAIN = [['rajin berlatih', 'menjadi juara', 'mendapat hadiah'], ['harga naik', 'permintaan turun', 'penjualan turun'], ['mesin dirawat rutin', 'mesin jarang rusak', 'produksi lancar'], ['tidur cukup', 'badan segar', 'kerja lebih fokus'], ['belajar teratur', 'nilai ujian baik', 'diterima di kampus favorit']];
+  const LG = [
+    R => { const [X, Y] = R.pick(SY), N = R.pick(NAMA); return { q: 'Semua ' + X + ' ' + Y + '. ' + N + ' adalah ' + X + '. Jadi …', a: N + ' ' + Y, c: [N + ' tidak ' + Y, 'Sebagian ' + X + ' tidak ' + Y, N + ' bukan ' + X, TDK, 'Semua yang ' + Y + ' adalah ' + X], e: 'Semua ' + X + ' ' + Y + ', dan ' + N + ' termasuk ' + X + ', maka ' + N + ' pasti ' + Y }; },
+    R => { const [X, Y] = R.pick(SY), N = R.pick(NAMA); return { q: 'Semua ' + X + ' ' + Y + '. ' + N + ' tidak ' + Y + '. Jadi …', a: N + ' bukan ' + X, c: [N + ' adalah ' + X, N + ' ' + Y, 'Sebagian ' + X + ' tidak ' + Y, TDK], e: 'Modus tollens: yang tidak ' + Y + ' pasti bukan ' + X }; },
+    R => { const [X, Y] = R.pick(SY), N = R.pick(NAMA); return { q: 'Semua ' + X + ' ' + Y + '. ' + N + ' ' + Y + '. Jadi …', a: TDK, c: [N + ' adalah ' + X, N + ' bukan ' + X, 'Semua yang ' + Y + ' adalah ' + X, N + ' tidak ' + Y], e: 'Orang yang ' + Y + ' belum tentu ' + X }; },
+    R => { const [X, Y] = R.pick(SY), N = R.pick(NAMA); return { q: 'Semua ' + X + ' ' + Y + '. ' + N + ' bukan ' + X + '. Jadi …', a: TDK, c: [N + ' tidak ' + Y, N + ' ' + Y, 'Mustahil ' + N + ' ' + Y, N + ' adalah ' + X], e: 'Premis hanya membahas ' + X + '; ' + N + ' bukan ' + X + ' sehingga tidak ada kesimpulan pasti' }; },
+    R => { const [X, Z] = R.pick(NOP), N = R.pick(NAMA); return { q: 'Tidak ada ' + X + ' yang ' + Z + '. ' + N + ' adalah ' + X + '. Jadi …', a: N + ' tidak ' + Z, c: [N + ' ' + Z, 'Sebagian ' + X + ' ' + Z, N + ' bukan ' + X, TDK], e: 'Semua ' + X + ' tidak ' + Z + ', termasuk ' + N }; },
+    R => { const [X, Y] = R.pick(SY), W = R.pick(WG); return { q: 'Semua ' + X + ' ' + Y + '. Sebagian ' + W + ' adalah ' + X + '. Jadi …', a: 'Sebagian ' + W + ' ' + Y, c: ['Semua ' + W + ' ' + Y, 'Tidak ada ' + W + ' yang ' + Y, 'Semua ' + X + ' adalah ' + W, TDK], e: cap(W) + ' yang termasuk ' + X + ' pasti ' + Y }; },
+    R => { const [p, q, np, nq] = R.pick(COND); return { q: 'Jika ' + p + ', maka ' + q + '. Ternyata ' + p + '. Jadi …', a: cap(q), c: [cap(nq), cap(np), TDK, 'Jika ' + q + ', maka ' + p], e: 'Modus ponens: syarat terpenuhi, maka akibatnya terjadi' }; },
+    R => { const [p, q, np, nq] = R.pick(COND); return { q: 'Jika ' + p + ', maka ' + q + '. Ternyata ' + nq + '. Jadi …', a: cap(np), c: [cap(p), cap(q), TDK, 'Jika ' + np + ', maka ' + nq], e: 'Modus tollens: akibat tidak terjadi, maka syaratnya tidak terjadi' }; },
+    R => { const [p, q, np, nq] = R.pick(COND); return { q: 'Jika ' + p + ', maka ' + q + '. Ternyata ' + q + '. Jadi …', a: TDK, c: [cap(p), cap(np), 'Jika ' + q + ', maka ' + p, cap(nq)], e: cap(q) + ' bisa terjadi karena sebab lain' }; },
+    R => { const [p, q, r] = R.pick(CHAIN); return { q: 'Jika ' + p + ', maka ' + q + '. Jika ' + q + ', maka ' + r + '. Jadi …', a: 'Jika ' + p + ', maka ' + r, c: ['Jika ' + r + ', maka ' + p, 'Jika tidak ' + p + ', maka tidak ' + r, 'Jika ' + q + ', maka ' + p, TDK], e: 'Silogisme: p → q dan q → r, maka p → r' }; },
+    R => { const [X, Y] = R.pick(SY); return { q: 'Negasi dari pernyataan "Semua ' + X + ' ' + Y + '" adalah …', a: 'Ada ' + X + ' yang tidak ' + Y, c: ['Semua ' + X + ' tidak ' + Y, 'Tidak ada ' + X + ' yang ' + Y, 'Sebagian ' + X + ' ' + Y, 'Semua yang ' + Y + ' adalah ' + X], e: 'Negasi "semua" adalah "ada yang tidak"' }; },
+    R => { const [p, q, np, nq] = R.pick(COND); return { q: 'Negasi dari "Jika ' + p + ', maka ' + q + '" adalah …', a: cap(p) + ' dan ' + nq, c: [cap(p) + ' dan ' + q, cap(np) + ' dan ' + q, 'Jika ' + np + ', maka ' + nq, 'Jika ' + q + ', maka ' + p], e: 'Negasi "jika p maka q" adalah "p dan tidak q"' }; },
+    R => { const [p, q, np, nq] = R.pick(COND); return { q: 'Pernyataan yang setara dengan "Jika ' + p + ', maka ' + q + '" adalah …', a: 'Jika ' + nq + ', maka ' + np, c: ['Jika ' + np + ', maka ' + nq, 'Jika ' + q + ', maka ' + p, cap(p) + ' dan ' + nq, cap(p) + ' atau ' + nq], e: 'Kontraposisi: "jika tidak q, maka tidak p"' }; }
+  ];
+  const LA = [
+    R => { const C = R.pick([['lebih tinggi', 'lebih pendek', 'paling tinggi', 'paling pendek', 'tertinggi kedua'], ['lebih berat', 'lebih ringan', 'paling berat', 'paling ringan', 'terberat kedua'], ['lebih tua', 'lebih muda', 'paling tua', 'paling muda', 'tertua kedua']]), o = R.shuffle(NAMA).slice(0, 4), st = [0, 1, 2].map(i => R.f() < 0.5 ? o[i] + ' ' + C[0] + ' dari ' + o[i + 1] : o[i + 1] + ' ' + C[1] + ' dari ' + o[i]), ask = R.int(0, 2), target = [o[0], o[3], o[1]][ask]; return { q: R.shuffle(st).join('. ') + '. Siapa yang ' + [C[2], C[3], C[4]][ask] + '?', a: target, c: o.filter(x => x !== target).concat(['Tidak dapat ditentukan']), e: 'Urutan dari yang ' + C[2] + ': ' + o.join(', ') }; },
+    R => { const o = R.shuffle(NAMA).slice(0, 5), st = [0, 1, 2, 3].map(i => R.f() < 0.5 ? o[i] + ' tepat di depan ' + o[i + 1] : o[i + 1] + ' tepat di belakang ' + o[i]), k = R.int(1, 5); return { q: 'Lima orang mengantre. ' + R.shuffle(st).join('. ') + '. Siapa yang berada di urutan ke-' + k + ' dari depan?', a: o[k - 1], c: o.filter((x, i) => i !== k - 1), e: 'Urutan dari depan: ' + o.join(', ') }; },
+    R => { const D = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'], i = R.int(0, 6), n = R.int(9, 150), ans = D[(i + n) % 7]; return { q: 'Hari ini hari ' + D[i] + '. Hari apakah ' + n + ' hari lagi?', a: ans, c: D.filter(x => x !== ans), e: n + ' = ' + Math.floor(n / 7) + ' × 7 + ' + n % 7 + ' → ' + D[i] + ' + ' + n % 7 + ' hari = ' + ans }; },
+    R => { const W = ['KERJA', 'MESIN', 'PABRIK', 'TEKNIK', 'PANDAI', 'SEHAT', 'RAJIN', 'KANTOR', 'BELAJAR', 'POMPA', 'KATUP', 'BAUT'], [w1, w2] = two(R, W), k = R.pick([1, 2, -1, 3]), enc = (w, s) => w.split('').map(ch => ABC[(ABC.indexOf(ch) + s + 26) % 26]).join(''), ans = enc(w2, k), alt = ans.slice(0, -1) + ABC[(ABC.indexOf(ans.slice(-1)) + 1) % 26]; return { q: 'Jika ' + w1 + ' ditulis ' + enc(w1, k) + ', maka ' + w2 + ' ditulis …', a: ans, c: [enc(w2, k + 1), enc(w2, k - 1 === 0 ? -1 : k - 1), enc(w2, -k), alt, enc(w2, k + 2)], e: 'Setiap huruf ' + (k > 0 ? 'maju ' : 'mundur ') + Math.abs(k) }; },
+    R => { const x = R.int(2, 8), d = R.int(2, 9), m = R.pick([2, 3]); return { q: x + ' orang dapat menyelesaikan ' + x + ' pekerjaan dalam ' + d + ' hari. Berapa hari yang dibutuhkan ' + x * m + ' orang untuk menyelesaikan ' + x * m + ' pekerjaan yang sama?', a: hari(d), c: [d * m, d + m, d * 2, d + 1, Math.max(1, d - 1), d * x].map(hari), e: 'Satu orang menyelesaikan satu pekerjaan dalam ' + d + ' hari, jadi tetap ' + d + ' hari' }; },
+    R => { const EV = [['lulus kuliah', 'Lulus'], ['bekerja', 'Bekerja'], ['membeli mobil', 'Mobil'], ['membeli rumah', 'Rumah'], ['menikah', 'Menikah'], ['membuka usaha', 'Usaha'], ['melanjutkan S2', 'S2'], ['naik haji', 'Haji']], o = R.shuffle(EV).slice(0, 5), N = R.pick(NAMA), st = R.shuffle([0, 1, 2, 3].map(i => R.f() < 0.5 ? 'ingin ' + o[i + 1][0] + ' setelah ' + o[i][0] : 'ingin ' + o[i][0] + ' sebelum ' + o[i + 1][0])), lab = a => a.map(e => e[1]).join(' – '), sw = i => { const a = o.slice(); const t = a[i]; a[i] = a[i + 1]; a[i + 1] = t; return lab(a); }; return { q: N + ' ' + st[0] + '. Ia juga ' + st[1] + ', ' + st[2] + ', dan ' + st[3] + '. Mana urutan yang tepat?', a: lab(o), c: [sw(0), sw(1), sw(2), sw(3), lab(o.slice().reverse())], e: 'Urutan: ' + lab(o) }; }
+  ];
+  const PB = 'Nilai kebenaran pernyataan berikut: ';
+  const BBANK = [
+    ['Semua logam menghantarkan listrik. Besi adalah logam. Jadi, besi menghantarkan listrik.', 0, 'Semua pernyataan benar'],
+    ['Semua bilangan genap habis dibagi 2. Angka 18 adalah bilangan genap. Jadi, 18 habis dibagi 2.', 0, 'Semua pernyataan benar'],
+    ['Semua mamalia bernapas dengan paru-paru. Kucing adalah mamalia. Jadi, kucing bernapas dengan paru-paru.', 0, 'Semua pernyataan benar'],
+    ['Semua planet di tata surya mengelilingi matahari. Mars adalah planet di tata surya. Jadi, Mars mengelilingi matahari.', 0, 'Semua pernyataan benar'],
+    ['Semua hewan berkaki empat adalah mamalia. Buaya adalah hewan berkaki empat. Jadi, buaya adalah mamalia.', 1, 'Buaya berkaki empat tetapi reptil, jadi pernyataan pertama salah'],
+    ['Semua burung dapat terbang. Penguin adalah burung. Jadi, penguin dapat terbang.', 1, 'Penguin adalah burung yang tidak dapat terbang, jadi pernyataan pertama salah'],
+    ['Semua logam berwujud padat pada suhu ruang. Raksa adalah logam. Jadi, raksa berwujud padat pada suhu ruang.', 1, 'Raksa adalah logam yang cair pada suhu ruang'],
+    ['Semua planet mengelilingi matahari. Bulan adalah planet. Jadi, bulan mengelilingi matahari.', 2, 'Bulan adalah satelit, bukan planet'],
+    ['Semua mamalia menyusui anaknya. Ayam adalah mamalia. Jadi, ayam menyusui anaknya.', 2, 'Ayam adalah unggas, bukan mamalia'],
+    ['Semua ikan hidup di air. Lumba-lumba adalah ikan. Jadi, lumba-lumba hidup di air.', 2, 'Lumba-lumba adalah mamalia, bukan ikan'],
+    ['Semua ikan bernapas dengan paru-paru. Paus adalah ikan. Jadi, paus bernapas dengan paru-paru.', 3, 'Ikan bernapas dengan insang, dan paus adalah mamalia'],
+    ['Semua segitiga memiliki empat sisi. Persegi adalah segitiga. Jadi, persegi memiliki empat sisi.', 3, 'Segitiga bersisi tiga, dan persegi bukan segitiga'],
+    ['Semua serangga berkaki delapan. Laba-laba adalah serangga. Jadi, laba-laba berkaki delapan.', 3, 'Serangga berkaki enam, dan laba-laba bukan serangga'],
+    ['Semua karyawan wajib hadir dalam rapat hari Senin. Sinta adalah karyawan. Jadi, Sinta tidak wajib hadir dalam rapat hari Senin.', 4, 'Kesimpulan bertentangan dengan premis'],
+    ['Perusahaan hanya menerima pelamar minimal lulusan D3. Rina lulusan SMA. Jadi, Rina diterima di perusahaan tersebut.', 4, 'Rina tidak memenuhi syarat minimal D3'],
+    ['Semua peserta wajib membawa KTP. Doni adalah peserta. Jadi, Doni boleh tidak membawa KTP.', 4, 'Kesimpulan bertentangan dengan premis'],
+    ['Pabrik itu memberi kenaikan gaji paling banyak dua kali setahun. Nina karyawan berprestasi di pabrik itu. Jadi, Nina bisa naik gaji tiga kali setahun.', 4, 'Kesimpulan melanggar batas maksimal dua kali']
+  ];
+  function genLogika(R) {
+    const out = [];
+    R.shuffle(LG).slice(0, 12).forEach(fn => { const q = build(R, fn); if (q) out.push(q); });
+    R.shuffle(LA).concat([R.pick(LA)]).forEach(fn => { const q = build(R, fn); if (q) out.push(q); });
+    R.shuffle(BBANK).slice(0, 25 - out.length).forEach(b => out.push([PB + b[0], PREMIS, b[1], b[2]]));
+    return out;
+  }
+
+  // ---- Sinonim & antonim: kata|jawaban|kelompok makna (opsi pengecoh tidak diambil dari kelompok yang sama) ----
+  const SIN_BANK = 'Abrasi|Pengikisan;Absah|Sah|sah;Absolut|Mutlak|pasti;Absurd|Tidak masuk akal;Adaptasi|Penyesuaian|ubah;Afeksi|Kasih sayang;Agresi|Serangan;Agunan|Jaminan|jamin;Ahli|Pakar|pandai;Akselerasi|Percepatan;Akurat|Tepat|pasti;Aliansi|Persekutuan|kerja;Ambigu|Bermakna ganda;Amnesti|Pengampunan;Anarki|Kekacauan;Andal|Tangguh|pandai;Anulir|Batalkan;Apatis|Acuh tak acuh;Arogan|Sombong;Asa|Harapan|harap;Asumsi|Anggapan|nilai;Atensi|Perhatian|kesan;Bahari|Laut;Bahtera|Perahu;Bala|Bencana;Barbar|Tidak beradab;Berdikari|Mandiri;Bonafide|Dapat dipercaya;Cakrawala|Kaki langit;Defisit|Kekurangan;Dekadensi|Kemerosotan;Deviasi|Penyimpangan|simpang;Dogma|Ajaran;Domisili|Tempat tinggal;Efektif|Berhasil guna|efek;Efisien|Hemat|efek;Eksplisit|Tersurat;Eksplorasi|Penjelajahan;Elegan|Anggun;Emisi|Pancaran;Esensi|Inti|dasar;Estimasi|Perkiraan|nilai;Evaluasi|Penilaian|nilai;Evakuasi|Pemindahan;Fiktif|Khayalan;Fleksibel|Lentur;Fragmen|Penggalan;Frustrasi|Putus asa|putus;Fundamental|Dasar|dasar;Galat|Kesalahan|simpang;Hakiki|Sebenarnya|dasar;Hermetik|Kedap udara;Hipotesis|Dugaan sementara|nilai;Imbas|Dampak|pengaruh;Imitasi|Tiruan;Implisit|Tersirat;Impresi|Kesan|kesan;Indikasi|Petunjuk|kesan;Inisiatif|Prakarsa;Inovasi|Pembaruan|ubah;Insinuasi|Sindiran;Intensif|Sungguh-sungguh;Interaksi|Hubungan|kerja;Jenuh|Bosan|putus;Kapasitas|Daya tampung;Kendala|Hambatan;Klasifikasi|Penggolongan;Kolaborasi|Kerja sama|kerja;Kompeten|Cakap|pandai;Konklusi|Kesimpulan;Konsisten|Taat asas;Kontemporer|Masa kini|baru;Kontradiksi|Pertentangan;Kredibel|Dapat dipercaya;Kudapan|Makanan ringan;Lazim|Biasa;Lugas|Apa adanya;Mafhum|Paham|paham;Mahir|Terampil|pandai;Mekanisme|Cara kerja;Metafora|Perumpamaan;Modifikasi|Perubahan|ubah;Mutakhir|Terbaru|baru;Nalar|Pikiran|paham;Niscaya|Pasti|pasti;Nisbi|Relatif;Opini|Pendapat|nilai;Orisinal|Asli|dasar;Paradigma|Kerangka berpikir|paham;Partisipasi|Keikutsertaan|kerja;Prestise|Kewibawaan;Prioritas|Yang didahulukan;Prospek|Peluang|harap;Proteksi|Perlindungan|jamin;Rasional|Masuk akal;Regulasi|Peraturan;Relevan|Berkaitan;Renovasi|Pemugaran|ubah;Restorasi|Pemulihan|ubah;Rotasi|Perputaran;Sahih|Benar|sah;Sanksi|Hukuman;Signifikan|Berarti;Simultan|Serentak;Stagnan|Mandek;Subjektif|Pribadi;Substansi|Isi pokok|dasar;Sugesti|Pengaruh|pengaruh;Vakum|Hampa;Verifikasi|Pemeriksaan|nilai;Volatil|Mudah berubah|ubah;Wahana|Sarana'.split(';').map(s => s.split('|'));
+  const ANT_BANK = 'Abstrak|Konkret|nyata;Absolut|Relatif|rel;Nisbi|Mutlak;Absurd|Masuk akal;Agresif|Pasif|kaku;Pasif|Aktif|aktif;Amatir|Profesional;Apatis|Peduli;Arogan|Rendah hati;Asli|Palsu|palsu;Awal|Akhir;Boros|Hemat;Dangkal|Dalam;Defisit|Surplus;Dinamis|Statis|kaku;Divergen|Konvergen;Ekspor|Impor;Implisit|Eksplisit|jelas;Ambigu|Jelas|jelas;Eksternal|Internal;Ekstrovert|Introvert;Fana|Kekal;Fiksi|Fakta|nyata;Fleksibel|Kaku|kaku;Formal|Informal;Gaduh|Tenang;Heterogen|Homogen;Hulu|Hilir;Ilegal|Legal;Imigrasi|Emigrasi;Inferior|Superior;Inklusif|Eksklusif;Inflasi|Deflasi;Jamak|Tunggal|kecil;Jinak|Liar;Kawan|Lawan;Kikir|Dermawan|boros;Hemat|Boros|boros;Klimaks|Antiklimaks;Konservatif|Progresif|maju;Mundur|Maju|maju;Kreditur|Debitur;Longgar|Ketat;Makro|Mikro|kecil;Maksimal|Minimal|kecil;Mayoritas|Minoritas|kecil;Mewah|Sederhana|sederhana;Rumit|Sederhana|sederhana;Modern|Kuno|kuno;Mujur|Sial;Objektif|Subjektif;Ofensif|Defensif|kaku;Optimis|Pesimis|neg;Positif|Negatif|neg;Pesimis|Optimis;Pasang|Surut;Permanen|Temporer;Primer|Sekunder;Produsen|Konsumen;Prolog|Epilog;Protagonis|Antagonis;Pro|Kontra;Rajin|Malas;Rasional|Irasional;Sporadis|Terus-menerus;Sukarela|Terpaksa;Tandus|Subur;Terampil|Canggung;Teoretis|Praktis;Transparan|Buram;Vertikal|Horizontal;Zalim|Adil;Sempit|Luas;Tebal|Tipis;Tumpul|Tajam;Licin|Kesat;Murah|Mahal;Pandai|Bodoh;Gagal|Berhasil|menang;Kalah|Menang|menang;Mengapung|Tenggelam;Membeku|Mencair;Ekspansi|Kontraksi;Monoton|Variatif;Gelap|Terang|jelas;Kaya|Miskin;Dosa|Pahala;Benci|Cinta;Sehat|Sakit;Lambat|Cepat;Statis|Dinamis|aktif;Surplus|Defisit;Konkret|Abstrak;Subjektif|Objektif;Kekal|Fana;Profesional|Amatir;Eksklusif|Inklusif;Homogen|Heterogen;Superior|Inferior;Temporer|Permanen;Minoritas|Mayoritas|besar;Mikro|Makro|besar;Dermawan|Kikir;Ramah|Ketus|kasar;Sopan|Kurang ajar|kasar;Ceroboh|Teliti;Gemuk|Kurus;Jujur|Curang|palsu'.split(';').map(s => s.split('|'));
+  function genWords(R, bank, mode) {
+    return R.shuffle(bank).slice(0, 30).map(([w, a, g]) => {
+      const cands = bank.filter(e => e[1] !== a && e[1] !== w && e[0] !== w && (!g || e[2] !== g)).map(e => e[1]);
+      const p = pack(R, a, cands);
+      return mode === 'sin'
+        ? ['Sinonim kata "' + w + '" adalah …', p[0], p[1], w + ' = ' + a.toLowerCase()]
+        : ['Lawan kata "' + w + '" adalah …', p[0], p[1], 'Lawan kata ' + w.toLowerCase() + ' adalah ' + a.toLowerCase()];
+    });
+  }
+
+
+  // ---- Logika penalaran (gambar): 9 pola, 4 pilihan ----
+  const FIG = inner => '<svg viewBox="0 0 60 60" class="fig" aria-hidden="true"><rect x="3" y="3" width="54" height="54" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>' + inner + '</svg>';
+  const ang = a => ((a % 360) + 360) % 360;
+  const arrowF = a => FIG('<g transform="rotate(' + ang(a) + ' 30 30)"><line x1="30" y1="46" x2="30" y2="19" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M21 26 L30 12 L39 26 Z" fill="currentColor"/></g>');
+  const DOTP = [[30, 30], [18, 18], [42, 42], [42, 18], [18, 42], [30, 18], [30, 42], [18, 30], [42, 30]];
+  const dotsF = n => FIG(DOTP.slice(0, n).map(p => '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4.5" fill="currentColor"/>').join(''));
+  const fillF = k => FIG('<rect x="14" y="14" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"/>' + (k ? '<rect x="14" y="' + (46 - 8 * k) + '" width="32" height="' + 8 * k + '" fill="currentColor"/>' : ''));
+  const CORN = [[9, 9], [39, 9], [39, 39], [9, 39]];
+  const cornerF = (c, f) => FIG('<circle cx="30" cy="30" r="7" fill="none" stroke="currentColor" stroke-width="2"/><rect x="' + CORN[c][0] + '" y="' + CORN[c][1] + '" width="12" height="12" ' + (f ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="2"') + '/>');
+  const polyPts = n => Array.from({ length: n }, (_, i) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return (30 + 19 * Math.cos(a)).toFixed(1) + ',' + (30 + 19 * Math.sin(a)).toFixed(1); }).join(' ');
+  const polyF = n => FIG('<polygon points="' + polyPts(n) + '" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>');
+  const triF = (a, f) => FIG('<g transform="rotate(' + ang(a) + ' 30 30)"><path d="M30 13 L46 43 L14 43 Z" ' + (f ? 'fill="currentColor"' : 'fill="none"') + ' stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></g>');
+  const clockF = a => FIG('<circle cx="30" cy="30" r="20" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="30" cy="30" r="2.5" fill="currentColor"/><line x1="30" y1="30" x2="30" y2="14" stroke="currentColor" stroke-width="3" stroke-linecap="round" transform="rotate(' + ang(a) + ' 30 30)"/>');
+  const SHP = ['lingkaran', 'persegi', 'segitiga', 'belah ketupat'];
+  const shapeF = (s, f) => { const st = (f ? 'fill="currentColor"' : 'fill="none"') + ' stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"'; return FIG(s === 'lingkaran' ? '<circle cx="30" cy="30" r="15" ' + st + '/>' : s === 'persegi' ? '<rect x="16" y="16" width="28" height="28" ' + st + '/>' : s === 'segitiga' ? '<path d="M30 14 L46 44 L14 44 Z" ' + st + '/>' : '<path d="M30 12 L48 30 L30 48 L12 30 Z" ' + st + '/>'); };
+  const sizeF = k => { const z = 8 + 7 * k; return FIG('<rect x="' + (30 - z / 2) + '" y="' + (30 - z / 2) + '" width="' + z + '" height="' + z + '" fill="none" stroke="currentColor" stroke-width="2.5"/>'); };
+  const figQ = seq => '<p class="figtitle">Gambar mana yang melanjutkan pola berikut?</p><div class="figseq">' + seq.join('') + '<span class="figq" aria-hidden="true">?</span></div>';
+  const FGEN = [
+    R => { const step = R.pick([45, 90, -45, -90]), a0 = R.pick([0, 45, 90, 135, 180, 270]), a4 = a0 + 4 * step; return { q: figQ([0, 1, 2, 3].map(i => arrowF(a0 + step * i))), a: arrowF(a4), c: [a4 + 90, a4 + 180, a0 + 3 * step, a4 - 90, a4 + 45].map(arrowF), e: 'Panah berputar ' + Math.abs(step) + '° ' + (step > 0 ? 'searah' : 'berlawanan arah') + ' jarum jam setiap langkah' }; },
+    R => { const up = R.f() < 0.6, n0 = up ? R.int(1, 4) : R.int(5, 9), d = up ? 1 : -1, ans = n0 + 4 * d; return { q: figQ([0, 1, 2, 3].map(i => dotsF(n0 + d * i))), a: dotsF(ans), c: [ans + 1, ans - 1, ans + 2, ans - 2, n0].filter(v => v >= 1 && v <= 9 && v !== ans).map(dotsF), e: 'Jumlah titik ' + (up ? 'bertambah' : 'berkurang') + ' satu setiap langkah' }; },
+    R => { const up = R.f() < 0.5, seq = up ? [0, 1, 2, 3] : [4, 3, 2, 1], ans = up ? 4 : 0; return { q: figQ(seq.map(fillF)), a: fillF(ans), c: [0, 1, 2, 3, 4].filter(v => v !== ans).map(fillF), e: 'Bagian yang diarsir ' + (up ? 'naik' : 'turun') + ' seperempat setiap langkah' }; },
+    R => { const c0 = R.int(0, 3), dir = R.pick([1, -1]), alt = R.f() < 0.5, pos = i => ((c0 + dir * i) % 4 + 4) % 4, fil = i => alt ? i % 2 === 0 : true; return { q: figQ([0, 1, 2, 3].map(i => cornerF(pos(i), fil(i)))), a: cornerF(pos(4), fil(4)), c: [cornerF(pos(5), fil(4)), cornerF(pos(3), fil(4)), cornerF(pos(6), fil(4)), cornerF(pos(4), !fil(4))], e: 'Kotak kecil berpindah sudut ' + (dir > 0 ? 'searah' : 'berlawanan arah') + ' jarum jam' + (alt ? ', warnanya berganti hitam-putih' : '') }; },
+    R => { const s0 = R.pick([3, 4]), ans = s0 + 4; return { q: figQ([0, 1, 2, 3].map(i => polyF(s0 + i))), a: polyF(ans), c: [ans - 1, ans + 1, ans - 2, ans + 2].map(polyF), e: 'Jumlah sisi bertambah satu: berikutnya segi-' + ans }; },
+    R => { const step = R.pick([90, -90, 180]), f0 = R.f() < 0.5, a = i => step * i, f = i => i % 2 === 0 ? f0 : !f0; return { q: figQ([0, 1, 2, 3].map(i => triF(a(i), f(i)))), a: triF(a(4), f(4)), c: [triF(a(4), !f(4)), triF(a(4) + 90, f(4)), triF(a(4) + 90, !f(4)), triF(a(3), f(4)), triF(a(4) + 180, !f(4))], e: 'Segitiga berputar ' + Math.abs(step) + '°' + (step === 180 ? '' : step > 0 ? ' searah jarum jam' : ' berlawanan arah jarum jam') + ' dan warnanya berganti hitam-putih' }; },
+    R => { const step = R.pick([30, 60, 90]), a0 = R.pick([0, 30, 60, 90]), a4 = a0 + 4 * step; return { q: figQ([0, 1, 2, 3].map(i => clockF(a0 + step * i))), a: clockF(a4), c: [a4 + step, a4 - step * 2, a4 + 180, a4 + 90].map(clockF), e: 'Jarum bergerak ' + step + '° searah jarum jam setiap langkah' }; },
+    R => { const p = R.shuffle(SHP), f = R.f() < 0.5, cyc = p.slice(0, 3); return { q: figQ([0, 1, 2, 3].map(i => shapeF(cyc[i % 3], f))), a: shapeF(cyc[1], f), c: [shapeF(cyc[0], f), shapeF(cyc[2], f), shapeF(p[3], f), shapeF(cyc[1], !f)], e: 'Tiga bentuk berulang: ' + cyc.join(', ') + ', lalu kembali ke awal' }; },
+    R => { const up = R.f() < 0.5, seq = up ? [0, 1, 2, 3] : [4, 3, 2, 1], ans = up ? 4 : 0; return { q: figQ(seq.map(sizeF)), a: sizeF(ans), c: [0, 1, 2, 3, 4].filter(v => v !== ans).map(sizeF), e: 'Ukuran persegi ' + (up ? 'membesar' : 'mengecil') + ' bertahap' }; }
+  ];
+
+  // ---- Kemampuan verbal (analogi), 4 pilihan ----
+  const REL = [
+    { e: (a, b) => a + ' dipakai oleh ' + b.toLowerCase(), p: [['Stetoskop', 'Dokter'], ['Cangkul', 'Petani'], ['Kuas', 'Pelukis'], ['Gunting', 'Penjahit'], ['Gergaji', 'Tukang kayu'], ['Kamera', 'Fotografer'], ['Jala', 'Nelayan'], ['Kunci inggris', 'Montir'], ['Toga', 'Wisudawan'], ['Mahkota', 'Raja']] },
+    { e: (a, b) => a + ' berfungsi sebagai ' + b.toLowerCase(), p: [['Telepon', 'Alat komunikasi'], ['Mobil', 'Alat transportasi'], ['Lampu', 'Penerangan'], ['Uang', 'Alat pembayaran'], ['Pupuk', 'Penyubur tanaman'], ['Rumah', 'Tempat tinggal']] },
+    { e: (a, b) => a + ' mengukur ' + b.toLowerCase(), p: [['Termometer', 'Suhu'], ['Barometer', 'Tekanan udara'], ['Speedometer', 'Kecepatan'], ['Timbangan', 'Berat'], ['Penggaris', 'Panjang'], ['Higrometer', 'Kelembapan'], ['Amperemeter', 'Arus listrik'], ['Stopwatch', 'Waktu']] },
+    { e: (a, b) => a + ' adalah satuan ' + b.toLowerCase(), p: [['Gram', 'Massa'], ['Meter', 'Panjang'], ['Liter', 'Volume'], ['Detik', 'Waktu'], ['Volt', 'Tegangan'], ['Watt', 'Daya'], ['Celsius', 'Suhu'], ['Ampere', 'Arus listrik']] },
+    { e: (a, b) => a + ' adalah bagian dari ' + b.toLowerCase(), p: [['Roda', 'Mobil'], ['Daun', 'Pohon'], ['Jari', 'Tangan'], ['Atap', 'Rumah'], ['Halaman', 'Buku'], ['Sayap', 'Pesawat'], ['Pedal', 'Sepeda'], ['Lensa', 'Kamera'], ['Keyboard', 'Komputer']] },
+    { e: (a, b) => a + ' termasuk jenis ' + b.toLowerCase(), p: [['Mawar', 'Bunga'], ['Kakap', 'Ikan'], ['Merpati', 'Burung'], ['Apel', 'Buah'], ['Bayam', 'Sayuran'], ['Biola', 'Alat musik'], ['Sepak bola', 'Olahraga'], ['Jati', 'Pohon']] },
+    { e: (a, b) => a + ' adalah bahan untuk membuat ' + b.toLowerCase(), p: [['Kayu', 'Meja'], ['Benang', 'Kain'], ['Tepung', 'Roti'], ['Pasir', 'Kaca'], ['Kedelai', 'Tempe'], ['Susu', 'Keju'], ['Tanah liat', 'Gerabah'], ['Tebu', 'Gula']] },
+    { e: (a, b) => a + ' bekerja di ' + b.toLowerCase(), p: [['Dokter', 'Rumah sakit'], ['Guru', 'Sekolah'], ['Koki', 'Dapur'], ['Petani', 'Sawah'], ['Hakim', 'Pengadilan'], ['Montir', 'Bengkel'], ['Pustakawan', 'Perpustakaan'], ['Pramugari', 'Pesawat']] },
+    { e: (a, b) => a + ' mengemudikan ' + b.toLowerCase(), p: [['Pilot', 'Pesawat'], ['Masinis', 'Kereta api'], ['Nakhoda', 'Kapal'], ['Sopir', 'Bus'], ['Joki', 'Kuda'], ['Kusir', 'Delman']] },
+    { e: (a, b) => a + ' diatasi dengan ' + b.toLowerCase(), p: [['Lapar', 'Makanan'], ['Haus', 'Minuman'], ['Gelap', 'Lampu'], ['Sakit', 'Obat'], ['Kotor', 'Sabun'], ['Hujan', 'Payung'], ['Lelah', 'Istirahat']] },
+    { e: (a, b) => a + ' dipakai di ' + b.toLowerCase(), p: [['Topi', 'Kepala'], ['Sepatu', 'Kaki'], ['Sarung tangan', 'Tangan'], ['Kacamata', 'Mata'], ['Cincin', 'Jari'], ['Kalung', 'Leher']] },
+    { e: (a, b) => a + ' berlawanan dengan ' + b.toLowerCase(), p: [['Panas', 'Dingin'], ['Terang', 'Gelap'], ['Tinggi', 'Rendah'], ['Siang', 'Malam'], ['Tua', 'Muda'], ['Besar', 'Kecil'], ['Kaya', 'Miskin'], ['Atas', 'Bawah'], ['Maju', 'Mundur'], ['Cepat', 'Lambat']] },
+    { e: (a, b) => a + ' menghasilkan ' + b.toLowerCase(), p: [['Lebah', 'Madu'], ['Sapi', 'Susu'], ['Ayam', 'Telur'], ['Ulat sutra', 'Sutra'], ['Domba', 'Wol'], ['Pohon karet', 'Getah karet']] },
+    { e: (a, b) => a + ' memimpin ' + b.toLowerCase(), p: [['Presiden', 'Negara'], ['Lurah', 'Desa'], ['Gubernur', 'Provinsi'], ['Kapten', 'Tim'], ['Kepala sekolah', 'Sekolah'], ['Rektor', 'Universitas'], ['Camat', 'Kecamatan']] },
+    { e: (a, b) => b + ' adalah wadah ' + a.toLowerCase(), p: [['Uang', 'Dompet'], ['Air', 'Ember'], ['Buku', 'Rak buku'], ['Pakaian', 'Lemari'], ['Abu rokok', 'Asbak'], ['Pensil', 'Kotak pensil'], ['Bensin', 'Tangki']] }
+  ];
+  function genAnalogi(R) {
+    const out = []; let pool = [], guard = 0;
+    while (out.length < 15 && guard++ < 200) {
+      if (!pool.length) pool = R.shuffle(REL);
+      const rel = pool.pop(), pr = R.shuffle(rel.p), p1 = pr[0], p2 = pr[1];
+      const cands = pr.slice(2).map(x => x[1]).filter(x => x !== p1[1]);
+      const p = pack(R, p2[1], cands, 3);
+      if (p) out.push([p1[0] + ' : ' + p1[1] + ' = ' + p2[0] + ' : …', p[0], p[1], rel.e(p1[0], p1[1]) + '; maka ' + rel.e(p2[0], p2[1])]);
+    }
+    return out;
+  }
+
+  const GEN = {
+    deret: R => genSeq(R, DG, 30),
+    cerita: R => genSeq(R, CG, 25),
+    logika: R => genLogika(R),
+    penalaran: R => genSeq(R, FGEN, 10, 3, 'svg'),
+    analogi: R => genAnalogi(R),
+    sinonim: R => genWords(R, SIN_BANK, 'sin'),
+    antonim: R => genWords(R, ANT_BANK, 'ant')
+  };
+  const QCACHE = {};
+  function getQs(code, id) {
+    code = Number(code) || 1;
+    if (code === 1 && TESTS[id].qs) return TESTS[id].qs;
+    const key = code + ':' + id;
+    if (!QCACHE[key]) QCACHE[key] = GEN[id](makeRng(code * 7919 + (ORDER.indexOf(id) + 1) * 104729));
+    return QCACHE[key];
+  }
+  const CODES = Array.from({ length: 15 }, (_, i) => i + 1);
+  const codeLabel = c => 'Kode ' + String(c).padStart(2, '0');
+
 
   const DRAW = {
     wartegg: {
@@ -422,13 +731,26 @@ details.sim-rev .rev { border-color: var(--line); }
   function record(id, name, correct, total) {
     const d = store.get();
     const pct = Math.round(correct / total * 100);
-    if (!d.best[id] || pct > d.best[id].pct) d.best[id] = { pct, correct, total };
-    d.hist.unshift({ t: Date.now(), name, correct, total });
+    const key = S.code + ':' + id;
+    if (!d.best[key] || pct > d.best[key].pct) d.best[key] = { pct, correct, total };
+    d.hist.unshift({ t: Date.now(), name, correct, total, code: S.code });
     d.hist = d.hist.slice(0, 8);
     store.set(d);
   }
 
-  let S = { view: 'home', shuffle: false, pending: null, run: null, result: null, sim: null, modal: null, reviewAll: false, draw: null, toast: '' };
+  function loadCode() { try { const v = Number(localStorage.getItem(KEY + '.code')); return v >= 1 && v <= 999 ? v : 1; } catch (e) { return 1; } }
+  function saveCode(c) { try { localStorage.setItem(KEY + '.code', String(c)); } catch (e) {} }
+  const DONASI_NO = '082112569100';
+  const shieldIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>';
+  function anonNote() { return '<div class="anon">' + shieldIcon + '<p><b>Tanpa daftar, tanpa login.</b> Kamu mengerjakan secara anonim. Jawaban dan skormu hanya tersimpan di perangkatmu sendiri dan tidak dikirim ke pemilik web.</p></div>'; }
+  function donasi() {
+    return '<section class="card"><div class="donasi-head"><span class="free-badge">100% Gratis</span><h2>Menerima open donasi</h2></div>' +
+      '<p class="muted">Trial Psikotest bisa dipakai gratis tanpa batas. Kalau latihan ini membantumu, kamu bisa berdonasi seikhlasnya lewat:</p>' +
+      '<div class="ewallet"><span class="chip">DANA</span><span class="chip">OVO</span><span class="chip">GoPay</span><span class="chip">Grab</span><span class="chip">ShopeePay</span></div>' +
+      '<div class="donasi-no"><span class="no" id="donasiNo">0821-1256-9100</span><button class="btn btn-primary btn-sm" data-act="copyno">Salin nomor</button></div>' +
+      '<p class="muted" style="font-size:13px">Pastikan nomor tujuan sudah benar sebelum mengirim.</p></section>';
+  }
+  let S = { view: 'home', code: 1, shuffle: true, pending: null, run: null, result: null, sim: null, modal: null, reviewAll: false, draw: null, toast: '' };
   const app = document.getElementById('app');
   let tick = null, toastT = null;
 
@@ -436,7 +758,7 @@ details.sim-rev .rev { border-color: var(--line); }
   const fmt = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
   const fmtUsed = ms => { const s = Math.round(ms / 1000); return Math.floor(s / 60) + ' mnt ' + (s % 60) + ' dtk'; };
   const today = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const totalSoal = ORDER.reduce((a, k) => a + TESTS[k].qs.length, 0);
+  const totalSoal = ORDER.reduce((a, k) => a + TESTS[k].n, 0);
   const totalMin = ORDER.reduce((a, k) => a + TESTS[k].minutes, 0);
   const clockIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   const starSvg = on => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="' + (on ? 'var(--ragu)' : 'none') + '" stroke="' + (on ? 'var(--ragu)' : 'var(--line)') + '" stroke-width="1.6" stroke-linejoin="round"/></svg>';
@@ -452,9 +774,9 @@ details.sim-rev .rev { border-color: var(--line); }
   function viewHome() {
     const d = store.get();
     const cards = ORDER.map(k => {
-      const t = TESTS[k], b = d.best[k];
+      const t = TESTS[k], b = d.best[S.code + ':' + k];
       return '<article class="card test-card"><span class="eyebrow">Subtes</span><h3>' + esc(t.name) + '</h3><p class="muted">' + esc(t.desc) + '</p>' +
-        '<div class="meta"><span class="chip">' + t.qs.length + ' soal</span><span class="chip">' + t.minutes + ' menit</span><span class="chip">Target ' + t.target + ' benar</span></div>' +
+        '<div class="meta"><span class="chip">' + t.n + ' soal</span><span class="chip">' + t.minutes + ' menit</span><span class="chip">Target ' + t.target + ' benar</span></div>' +
         '<div class="foot"><span class="best">Skor terbaik: <b>' + (b ? b.correct + '/' + b.total : '—') + '</b></span><button class="btn btn-primary btn-sm" data-act="intro" data-v="' + k + '">Mulai</button></div></article>';
     }).join('');
     const drawCards = Object.keys(DRAW).map(k => {
@@ -464,55 +786,59 @@ details.sim-rev .rev { border-color: var(--line); }
         '<div class="foot"><span class="best">Kertas A4 + pensil</span><button class="btn btn-ghost btn-sm" data-act="drawintro" data-v="' + k + '">Mulai</button></div></article>';
     }).join('');
     const hist = d.hist.length ? '<div class="card"><div class="scroll-x"><table class="hist"><thead><tr><th>Waktu</th><th>Tes</th><th>Skor</th><th>%</th></tr></thead><tbody>' +
-      d.hist.map(h => '<tr><td>' + esc(new Date(h.t).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</td><td>' + esc(h.name) + '</td><td class="num">' + h.correct + '/' + h.total + '</td><td class="num">' + Math.round(h.correct / h.total * 100) + '%</td></tr>').join('') +
+      d.hist.map(h => '<tr><td>' + esc(new Date(h.t).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</td><td>' + esc(h.name) + (h.code ? ' <span class="muted">· ' + esc(codeLabel(h.code)) + '</span>' : '') + '</td><td class="num">' + h.correct + '/' + h.total + '</td><td class="num">' + Math.round(h.correct / h.total * 100) + '%</td></tr>').join('') +
       '</tbody></table></div></div>' : '<div class="card"><p class="muted">Belum ada riwayat. Selesaikan satu subtes dan skornya akan muncul di sini, hanya di perangkat ini.</p></div>';
     return '<div class="wrap">' + topbar('<span class="chip">' + esc(today) + '</span>') +
-      '<section class="hero"><div class="hero-left"><span class="eyebrow" style="color:var(--hero-muted)">Simulasi tes berbasis komputer</span><h1>Trial Psikotest<em>by Aa Shendi Yusuf</em></h1>' +
+      '<section class="hero"><div class="hero-left"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="free-badge">100% Gratis</span><span class="eyebrow" style="color:var(--hero-muted)">Simulasi tes berbasis komputer</span></div><h1>Trial Psikotest<em>by Aa Shendi Yusuf</em></h1>' +
       '<p>Kerjakan seperti tes sungguhan: ada batas waktu, bisa tandai ragu, dan jawaban baru dinilai setelah sesi berakhir. Skor dan soal yang salah muncul di akhir.</p>' +
       '<div class="actions"><button class="btn btn-primary" data-act="sim">Mulai Simulasi Lengkap</button></div></div>' +
-      '<div class="hero-right"><div class="row"><span>Subtes</span><b>' + ORDER.length + '</b></div><div class="row"><span>Total soal</span><b>' + totalSoal + '</b></div><div class="row"><span>Total waktu</span><b>' + totalMin + ' menit</b></div>' +
+      '<div class="hero-right"><div class="row"><span>Kode soal aktif</span><b>' + esc(codeLabel(S.code)) + '</b></div><div class="row"><span>Subtes</span><b>' + ORDER.length + '</b></div><div class="row"><span>Total soal</span><b>' + totalSoal + '</b></div><div class="row"><span>Total waktu</span><b>' + totalMin + ' menit</b></div>' +
       '<label class="toggle" style="color:var(--hero-ink)"><input type="checkbox" id="shuffle" ' + (S.shuffle ? 'checked' : '') + '> Acak urutan soal</label></div></section>' +
-      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Pilih subtes</h2><span class="muted" style="font-size:13px">Jawaban tidak dinilai sampai sesi selesai</span></div><div class="grid">' + cards + '</div></section>' +
+      anonNote() + '<section class="card" style="gap:14px"><div class="section-head"><h2>Kode soal</h2><span class="muted" style="font-size:13px">Setiap kode berisi set soal berbeda. Kode 01 = paket dasar.</span></div>' +
+      '<div class="codegrid" role="group" aria-label="Pilih kode soal">' + CODES.map(c => '<button class="codebtn" data-act="setcode" data-v="' + c + '" aria-pressed="' + (S.code === c) + '">' + String(c).padStart(2, '0') + '</button>').join('') + '</div>' +
+      '<div class="codeinput"><label for="codeInput">Kode lain (1–999)</label><input id="codeInput" type="number" min="1" max="999" inputmode="numeric" placeholder="mis. 123" value="' + (S.code > CODES.length ? S.code : '') + '"><button class="btn btn-ghost btn-sm" data-act="usecode">Pakai kode</button><button class="btn btn-ghost btn-sm" data-act="randcode">Kode acak</button></div></section>' +
+      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Pilih subtes · ' + esc(codeLabel(S.code)) + '</h2><span class="muted" style="font-size:13px">Jawaban tidak dinilai sampai sesi selesai</span></div><div class="grid">' + cards + '</div></section>' +
       '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Tes gambar</h2><span class="muted" style="font-size:13px">Timer + checklist penilaian diri</span></div><div class="grid">' + drawCards + '</div></section>' +
-      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Riwayat terakhir</h2>' + (d.hist.length ? '<button class="btn btn-ghost btn-sm" data-act="askreset">Reset riwayat &amp; skor</button>' : '') + '</div>' + hist + '</section></div>';
+      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Riwayat terakhir</h2>' + (d.hist.length ? '<button class="btn btn-ghost btn-sm" data-act="askreset">Reset riwayat &amp; skor</button>' : '') + '</div>' + hist + '</section>' + donasi() + '</div>';
   }
 
   function viewIntro() {
     const k = S.pending, t = TESTS[k];
     const simInfo = S.sim ? '<span class="chip ok">Simulasi lengkap · kategori ' + (S.sim.idx + 1) + ' dari ' + ORDER.length + '</span>' : '';
     return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="' + (S.sim ? 'askexit' : 'home') + '">' + (S.sim ? 'Keluar simulasi' : 'Kembali') + '</button>') +
-      '<section class="card intro" style="padding:28px;gap:18px">' + simInfo + '<span class="eyebrow">Petunjuk kategori</span><h1>' + esc(t.name) + '</h1><p class="muted">' + esc(t.desc) + '</p>' +
-      '<div class="facts"><div class="fact"><b>' + t.qs.length + '</b><span>soal pilihan ganda</span></div><div class="fact"><b>' + t.minutes + ':00</b><span>menit waktu kerja</span></div><div class="fact"><b>' + t.target + '</b><span>target jawaban benar</span></div></div>' +
+      '<section class="card intro" style="padding:28px;gap:18px"><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">' + esc(codeLabel(S.code)) + '</span>' + simInfo + '</div><span class="eyebrow">Petunjuk kategori</span><h1>' + esc(t.name) + '</h1><p class="muted">' + esc(t.desc) + '</p>' +
+      '<div class="facts"><div class="fact"><b>' + t.n + '</b><span>soal pilihan ganda</span></div><div class="fact"><b>' + t.minutes + ':00</b><span>menit waktu kerja</span></div><div class="fact"><b>' + t.target + '</b><span>target jawaban benar</span></div></div>' +
       '<ol class="rules"><li>Pilih satu jawaban (A–E) di setiap soal. Jawaban bisa diubah selama waktu masih berjalan.</li><li>Pindah soal lewat tombol atau nomor soal di panel. Gunakan <b>Tandai Ragu</b> untuk soal yang ingin dicek ulang.</li><li>Benar atau salah tidak ditampilkan selama tes. Skor dan pembahasan muncul setelah kategori selesai.</li><li>Saat waktu habis, kategori otomatis selesai dan soal kosong dihitung salah.</li><li>Keyboard: tombol A–E atau 1–5 untuk memilih, panah kiri/kanan untuk pindah soal.</li></ol>' +
       '<div class="actions"><button class="btn btn-primary" data-act="start">Mulai Tes</button></div></section></div>';
   }
 
   function counts() {
-    const r = S.run, n = TESTS[r.id].qs.length;
+    const r = S.run, n = TESTS[r.id].n;
     const done = Object.keys(r.answers).length, ragu = Object.values(r.ragu).filter(Boolean).length;
     return { n, done, ragu, empty: n - done };
   }
 
   function viewExam() {
-    const r = S.run, t = TESTS[r.id], pos = r.cur, qi = r.order[pos], q = t.qs[qi], n = r.order.length;
+    const r = S.run, t = TESTS[r.id], pos = r.cur, qi = r.order[pos], q = getQs(r.code, r.id)[qi], n = r.order.length;
     const chosen = r.answers[qi];
     const rem = r.endAt - Date.now(), warn = rem < 60000;
     const pct = Math.max(0, rem / (t.minutes * 60000) * 100);
     const c = counts();
-    const wmLine = 'Aa Shendi Yusuf · ' + today + ' · Trial Psikotest';
+    const wmLine = 'Aa Shendi Yusuf · ' + codeLabel(r.code) + ' · ' + today;
     const wm = '<div class="wm" aria-hidden="true">' + new Array(7).fill('<span>' + esc(wmLine) + '</span>').join('') + '</div>';
-    const opts = q[1].map((o, i) => '<button class="opt" data-act="pick" data-v="' + i + '" aria-pressed="' + (chosen === i) + '"><span class="dot"></span><span><b>' + L[i] + '.</b> ' + esc(o) + '</span></button>').join('');
+    const isSvg = q[4] === 'svg';
+    const opts = q[1].map((o, i) => '<button class="opt' + (isSvg ? ' figopt' : '') + '" data-act="pick" data-v="' + i + '" aria-pressed="' + (chosen === i) + '"' + (isSvg ? ' aria-label="Pilihan ' + L[i] + '"' : '') + '><span class="dot"></span><span><b>' + L[i] + '.</b> ' + (isSvg ? o : esc(o)) + '</span></button>').join('');
     const nums = r.order.map((qq, p) => {
       const cls = ['num']; if (r.ragu[qq]) cls.push('ragu'); else if (r.answers[qq] !== undefined) cls.push('done'); if (p === pos) cls.push('cur');
       return '<button class="' + cls.join(' ') + '" data-act="go" data-v="' + p + '" aria-label="Soal ' + (p + 1) + '">' + (p + 1) + '</button>';
     }).join('');
     const last = pos === n - 1;
     const simTag = S.sim ? ' · Kategori ' + (S.sim.idx + 1) + '/' + ORDER.length : '';
-    return '<div class="wrap" style="gap:18px"><div class="exam-bar"><div class="row"><div class="exam-title"><b>' + esc(t.name) + '</b><span>Trial Psikotest' + simTag + ' · ' + c.done + ' dari ' + n + ' terjawab</span></div>' +
+    return '<div class="wrap" style="gap:18px"><div class="exam-bar"><div class="row"><div class="exam-title"><b>' + esc(t.name) + '</b><span>' + esc(codeLabel(r.code)) + simTag + ' · ' + c.done + ' dari ' + n + ' terjawab</span></div>' +
       '<div style="display:flex;gap:10px;align-items:center"><span class="timer' + (warn ? ' warn' : '') + '" id="timer" role="timer" aria-label="Sisa waktu">' + clockIcon + '<span id="timerTxt">' + fmt(rem) + '</span></span><button class="btn btn-ghost btn-sm" data-act="askrestart">Ulangi</button><button class="btn btn-ghost btn-sm" data-act="askexit">Keluar</button></div></div>' +
       '<div class="timebar' + (warn ? ' warn' : '') + '" id="timebar"><i style="width:' + pct.toFixed(2) + '%"></i></div></div>' +
       '<div class="exam"><section class="qcard">' + wm + '<div class="qlabel">Soal ' + (pos + 1) + ' dari ' + n + (r.ragu[qi] ? '<span class="chip warn">Ditandai ragu</span>' : '') + '</div>' +
-      '<p class="qtext">' + esc(q[0]) + '</p><div class="opts" role="group" aria-label="Pilihan jawaban">' + opts + '</div>' +
+      (isSvg ? '<div class="qtext">' + q[0] + '</div>' : '<p class="qtext">' + esc(q[0]) + '</p>') + '<div class="opts' + (isSvg ? ' figgrid' : '') + '" role="group" aria-label="Pilihan jawaban">' + opts + '</div>' +
       '<div class="qnav"><button class="btn btn-ghost" data-act="prev" ' + (pos === 0 ? 'disabled' : '') + '>← Sebelumnya</button><div class="group"><button class="btn btn-ragu" data-act="ragu" aria-pressed="' + (!!r.ragu[qi]) + '">' + (r.ragu[qi] ? 'Hapus Tanda Ragu' : 'Tandai Ragu') + '</button>' +
       (last ? '<button class="btn btn-primary" data-act="askfinish">Selesai Kategori</button>' : '<button class="btn btn-primary" data-act="next">Selanjutnya →</button>') + '</div></div></section>' +
       '<aside class="side"><h3>Nomor soal</h3><div class="numgrid">' + nums + '</div><div class="legend"><span><i class="done"></i>Dijawab</span><span><i class="ragu"></i>Ragu</span><span><i></i>Kosong</span></div>' +
@@ -531,10 +857,11 @@ details.sim-rev .rev { border-color: var(--line); }
     return items.map(x => {
       const ok = x.chosen === x.q[2], blank = x.chosen === null;
       const pill = ok ? '<span class="chip ok">Benar</span>' : blank ? '<span class="chip warn">Tidak dijawab</span>' : '<span class="chip bad">Salah</span>';
-      const yours = blank ? '<span class="muted">—</span>' : '<span class="' + (ok ? 'right' : 'wrong') + '">' + L[x.chosen] + '. ' + esc(x.q[1][x.chosen]) + '</span>';
-      return '<article class="rev"><div class="rev-head"><b>SOAL NO. ' + (x.i + 1) + '</b>' + pill + '</div><p class="rev-q">' + esc(x.q[0]) + '</p>' +
+      const sv = x.q[4] === 'svg', fo = i => L[i] + '. ' + (sv ? '<span class="figinline">' + x.q[1][i] + '</span>' : esc(x.q[1][i]));
+      const yours = blank ? '<span class="muted">—</span>' : '<span class="' + (ok ? 'right' : 'wrong') + '">' + fo(x.chosen) + '</span>';
+      return '<article class="rev"><div class="rev-head"><b>SOAL NO. ' + (x.i + 1) + '</b>' + pill + '</div>' + (sv ? '<div class="rev-q">' + x.q[0] + '</div>' : '<p class="rev-q">' + esc(x.q[0]) + '</p>') +
         '<div class="ans-line"><span class="lbl">Jawaban kamu</span>' + yours + '</div>' +
-        (ok ? '' : '<div class="ans-line"><span class="lbl">Jawaban benar</span><span class="right">' + L[x.q[2]] + '. ' + esc(x.q[1][x.q[2]]) + '</span></div>') +
+        (ok ? '' : '<div class="ans-line"><span class="lbl">Jawaban benar</span><span class="right">' + fo(x.q[2]) + '</span></div>') +
         '<p class="expl"><b>Pembahasan:</b> ' + esc(x.q[3]) + '</p></article>';
     }).join('');
   }
@@ -543,12 +870,12 @@ details.sim-rev .rev { border-color: var(--line); }
     const res = S.result, t = TESTS[res.id], p = Math.round(res.correct / res.total * 100), st = starsFor(p), pass = res.correct >= t.target;
     return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="home">Beranda</button>') +
       '<section class="card score-card" style="padding:28px"><div class="ring">' + ringSvg(p) + '<div class="val"><b>' + res.correct + '/' + res.total + '</b><span>' + p + '%</span></div></div>' +
-      '<div class="score-info"><span class="eyebrow">Hasil · ' + esc(t.name) + '</span><h1>' + esc(levelFor(p)) + '</h1><div class="stars" aria-label="' + st + ' dari 3 bintang">' + starSvg(st >= 1) + starSvg(st >= 2) + starSvg(st >= 3) + '</div>' +
+      '<div class="score-info"><span class="eyebrow">Hasil · ' + esc(t.name) + ' · ' + esc(codeLabel(res.code || 1)) + '</span><h1>' + esc(levelFor(p)) + '</h1><div class="stars" aria-label="' + st + ' dari 3 bintang">' + starSvg(st >= 1) + starSvg(st >= 2) + starSvg(st >= 3) + '</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' + (pass ? '<span class="chip ok">Lolos target ' + t.target + ' benar</span>' : '<span class="chip bad">Belum mencapai target ' + t.target + ' benar</span>') + (res.timeout ? '<span class="chip warn">Waktu habis</span>' : '') + '</div></div></section>' +
       '<div class="stats"><div class="stat ok"><b>' + res.correct + '</b><span>Benar</span></div><div class="stat bad"><b>' + res.wrong + '</b><span>Salah</span></div><div class="stat"><b>' + res.blank + '</b><span>Tidak dijawab</span></div><div class="stat"><b>' + fmtUsed(res.used) + '</b><span>Waktu dipakai</span></div></div>' +
-      '<div class="actions"><button class="btn btn-primary" data-act="intro" data-v="' + res.id + '">Ulangi Tes</button><button class="btn btn-ghost" data-act="home">Pilih Tes Lain</button></div>' +
+      '<div class="actions"><button class="btn btn-primary" data-act="intro" data-v="' + res.id + '">Ulangi Tes</button><button class="btn btn-ghost" data-act="nextcode" data-v="' + res.id + '">Coba ' + esc(codeLabel(S.code >= 999 ? 1 : S.code + 1)) + '</button><button class="btn btn-ghost" data-act="home">Pilih Tes Lain</button></div>' +
       '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Pembahasan</h2><div class="filter" role="group" aria-label="Filter pembahasan"><button data-act="revfilter" data-v="0" aria-pressed="' + !S.reviewAll + '">Salah & kosong</button><button data-act="revfilter" data-v="1" aria-pressed="' + S.reviewAll + '">Semua soal</button></div></div>' +
-      '<div class="review">' + reviewList(res, S.reviewAll) + '</div></section></div>';
+      '<div class="review">' + reviewList(res, S.reviewAll) + '</div></section>' + donasi() + '</div>';
   }
 
   function viewBetween() {
@@ -556,7 +883,7 @@ details.sim-rev .rev { border-color: var(--line); }
     return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="askexit">Keluar simulasi</button>') +
       '<section class="card intro" style="padding:28px;gap:16px"><span class="chip ok" style="align-self:flex-start">Kategori ' + S.sim.idx + ' dari ' + ORDER.length + ' selesai</span><h1>' + esc(prev.name) + ' selesai</h1>' +
       '<p class="muted">Jawaban sudah dikunci. Skor semua kategori ditampilkan setelah simulasi berakhir.</p>' +
-      '<div class="card" style="background:var(--chip);border:0"><span class="eyebrow">Berikutnya</span><h2 style="font-size:22px">' + esc(next.name) + '</h2><p class="muted">' + next.qs.length + ' soal · ' + next.minutes + ' menit · ' + esc(next.desc) + '</p></div>' +
+      '<div class="card" style="background:var(--chip);border:0"><span class="eyebrow">Berikutnya</span><h2 style="font-size:22px">' + esc(next.name) + '</h2><p class="muted">' + next.n + ' soal · ' + next.minutes + ' menit · ' + esc(next.desc) + '</p></div>' +
       '<div class="actions"><button class="btn btn-primary" data-act="intro" data-v="' + S.pending + '">Lanjut ke Petunjuk</button><button class="btn btn-ghost" data-act="askrestartsim">Ulangi Simulasi dari Awal</button></div></section></div>';
   }
 
@@ -569,11 +896,11 @@ details.sim-rev .rev { border-color: var(--line); }
       return '<details class="sim-rev"><summary><span>' + esc(t.name) + '</span><span class="muted" style="font-weight:600">' + wrongN + ' soal salah/kosong</span></summary><div class="review">' + reviewList(r, false) + '</div></details>'; }).join('');
     return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="home">Beranda</button>') +
       '<section class="card score-card" style="padding:28px"><div class="ring">' + ringSvg(p) + '<div class="val"><b>' + cor + '/' + tot + '</b><span>' + p + '%</span></div></div>' +
-      '<div class="score-info"><span class="eyebrow">Hasil simulasi lengkap</span><h1>' + esc(levelFor(p)) + '</h1><div class="stars" aria-label="' + st + ' dari 3 bintang">' + starSvg(st >= 1) + starSvg(st >= 2) + starSvg(st >= 3) + '</div>' +
+      '<div class="score-info"><span class="eyebrow">Hasil simulasi lengkap · ' + esc(codeLabel(S.code)) + '</span><h1>' + esc(levelFor(p)) + '</h1><div class="stars" aria-label="' + st + ' dari 3 bintang">' + starSvg(st >= 1) + starSvg(st >= 2) + starSvg(st >= 3) + '</div>' +
       '<span class="chip ' + (passed === rs.length ? 'ok' : 'warn') + '" style="align-self:flex-start">' + passed + ' dari ' + rs.length + ' kategori lolos target</span></div></section>' +
       '<div class="card"><div class="scroll-x"><table class="hist"><thead><tr><th>Kategori</th><th>Skor</th><th>%</th><th>Target</th><th>Waktu</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>' +
       '<div class="actions"><button class="btn btn-primary" data-act="sim">Ulangi Simulasi</button><button class="btn btn-ghost" data-act="home">Beranda</button></div>' +
-      '<section style="display:flex;flex-direction:column;gap:12px"><div class="section-head"><h2>Soal yang salah per kategori</h2></div>' + details + '</section></div>';
+      '<section style="display:flex;flex-direction:column;gap:12px"><div class="section-head"><h2>Soal yang salah per kategori</h2></div>' + details + '</section>' + donasi() + '</div>';
   }
 
   function warteggSvg() {
@@ -691,10 +1018,10 @@ details.sim-rev .rev { border-color: var(--line); }
 
   function startTest() {
     const k = S.pending, t = TESTS[k];
-    const order = t.qs.map((_, i) => i);
+    const order = getQs(S.code, k).map((_, i) => i);
     if (S.shuffle) shuffleArr(order);
     const now = Date.now();
-    S.run = { id: k, order, answers: {}, ragu: {}, cur: 0, startedAt: now, endAt: now + t.minutes * 60000 };
+    S.run = { id: k, code: S.code, order, answers: {}, ragu: {}, cur: 0, startedAt: now, endAt: now + t.minutes * 60000 };
     S.view = 'exam'; S.modal = null;
     render(); startTick();
   }
@@ -702,9 +1029,9 @@ details.sim-rev .rev { border-color: var(--line); }
   function finishTest(timeout) {
     stopTick();
     const r = S.run, t = TESTS[r.id];
-    const items = t.qs.map((q, i) => ({ i, q, chosen: r.answers[i] === undefined ? null : r.answers[i] }));
+    const items = getQs(r.code, r.id).map((q, i) => ({ i, q, chosen: r.answers[i] === undefined ? null : r.answers[i] }));
     const correct = items.filter(x => x.chosen === x.q[2]).length, blank = items.filter(x => x.chosen === null).length;
-    const res = { id: r.id, items, total: items.length, correct, blank, wrong: items.length - correct - blank, used: Math.min(Date.now(), r.endAt) - r.startedAt, timeout: !!timeout };
+    const res = { id: r.id, code: r.code, items, total: items.length, correct, blank, wrong: items.length - correct - blank, used: Math.min(Date.now(), r.endAt) - r.startedAt, timeout: !!timeout };
     record(r.id, t.name, correct, items.length);
     S.run = null; S.modal = null; S.reviewAll = false;
     if (S.sim) {
@@ -732,6 +1059,11 @@ details.sim-rev .rev { border-color: var(--line); }
     ragu() { const r = S.run, qi = r.order[r.cur]; r.ragu[qi] = !r.ragu[qi]; render(); },
     askfinish() { S.modal = 'finish'; render(); },
     askexit() { S.modal = 'exit'; render(); },
+    setcode(v) { S.code = Number(v); saveCode(S.code); render(); },
+    usecode() { const el = document.getElementById('codeInput'), v = Math.round(Number(el && el.value)); if (!(v >= 1 && v <= 999)) { showToast('Masukkan kode antara 1 dan 999.'); return; } S.code = v; saveCode(v); showToast('Memakai ' + codeLabel(v) + '.'); },
+    randcode() { const v = CODES.length + 1 + Math.floor(Math.random() * (999 - CODES.length)); S.code = v; saveCode(v); showToast('Memakai ' + codeLabel(v) + '.'); },
+    nextcode(v) { S.code = S.code >= 999 ? 1 : S.code + 1; saveCode(S.code); act.intro(v); },
+    copyno() { const done = () => showToast('Nomor ' + DONASI_NO + ' disalin.'), fail = () => showToast('Salin manual: ' + DONASI_NO); try { navigator.clipboard.writeText(DONASI_NO).then(done, fail); } catch (e) { fail(); } },
     askrestart() { S.modal = 'restart'; render(); },
     askrestartsim() { S.modal = 'restartsim'; render(); },
     askreset() { S.modal = 'reset'; render(); },
@@ -758,18 +1090,20 @@ details.sim-rev .rev { border-color: var(--line); }
     if (e.target.id === 'shuffle') S.shuffle = e.target.checked;
     if (e.target.dataset && e.target.dataset.chk !== undefined && S.draw) { S.draw.checked[Number(e.target.dataset.chk)] = e.target.checked; }
   });
+  app.addEventListener('keydown', e => { if (e.target && e.target.id === 'codeInput' && e.key === 'Enter') { e.preventDefault(); act.usecode(); } });
   document.addEventListener('keydown', e => {
     if (S.view !== 'exam' || S.modal || e.metaKey || e.ctrlKey || e.altKey) return;
     const tag = (e.target.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea') return;
     const k = e.key.toLowerCase();
     const idx = ['a', 'b', 'c', 'd', 'e'].indexOf(k) >= 0 ? ['a', 'b', 'c', 'd', 'e'].indexOf(k) : ['1', '2', '3', '4', '5'].indexOf(k);
-    if (idx >= 0) { act.pick(idx); e.preventDefault(); }
+    if (idx >= 0) { const qq = getQs(S.run.code, S.run.id)[S.run.order[S.run.cur]]; if (idx < qq[1].length) { act.pick(idx); e.preventDefault(); } }
     else if (e.key === 'ArrowRight') { act.next(); e.preventDefault(); }
     else if (e.key === 'ArrowLeft') { act.prev(); e.preventDefault(); }
   });
 
   function boot(data) {
     if (data && data.S) { S = Object.assign(S, data.S, { toast: '' }); }
+    if (!(data && data.S) || !S.code) S.code = loadCode();
     render();
     if ((S.view === 'exam' && S.run) || (S.view === 'drawrun' && S.draw)) startTick();
   }
