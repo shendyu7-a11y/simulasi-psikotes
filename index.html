@@ -205,6 +205,8 @@ p { margin: 0; }
 .materi .actions { margin: 0; }
 @media (max-width: 560px) { .card.materi { flex-direction: column; align-items: flex-start; } .materi-cover { width: 110px; } }
 
+.anon.warnapp { background: var(--ragu-soft); color: var(--ragu-text); }
+
 /* Contoh soal */
 .examples { display: flex; flex-direction: column; gap: 14px; }
 .examples .section-head p { font-size: 14px; }
@@ -881,7 +883,21 @@ details.sim-rev .rev { border-color: var(--line); }
       (memo ? '<div class="rp-memo"><b>Daftar yang dihafal</b>' + memo.map(g => '<div><b>' + esc(g.cat) + '</b>: ' + g.words.map(esc).join(', ') + '</div>').join('') + '</div>' : '') +
       '<div class="rp-scroll"><table class="rp-tab"><thead><tr><th>No</th><th>Soal</th><th>Jawaban kamu</th><th>Kunci</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>';
   }
+  function drawReportHtml(e) {
+    const t = DRAW[e.id], ok = t.check.map((_, i) => !!(e.checked && e.checked[i])), cor = ok.filter(Boolean).length, pct = Math.round(cor / t.check.length * 100);
+    const when = new Date(e.t).toLocaleString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return '<article class="report">' +
+      '<header class="rp-head"><div><div class="rp-brand">Simulasi Psikotes</div><div class="rp-by">by Aa Shendi Yusuf · 100% Gratis</div></div><div class="rp-doc"><b>Laporan Tes Gambar</b><span>' + esc(when) + '</span></div></header>' +
+      '<section class="rp-sum"><div class="rp-score"><b>' + pct + '<small>%</small></b><span>' + cor + ' dari ' + t.check.length + ' poin</span></div>' +
+      '<div class="rp-meta"><h1>' + esc(t.name) + '</h1><p class="rp-level">Penilaian mandiri berdasarkan checklist' + (e.timeout ? ' · waktu habis' : '') + '</p>' +
+      '<dl><div><dt>Waktu tes</dt><dd>' + t.minutes + ' menit</dd></div><div><dt>Poin terpenuhi</dt><dd>' + cor + '</dd></div><div><dt>Belum terpenuhi</dt><dd>' + (t.check.length - cor) + '</dd></div></dl></div></section>' +
+      '<section class="rp-sec"><div class="rp-sechead"><h2>Checklist</h2></div><div class="rp-scroll"><table class="rp-tab"><thead><tr><th>No</th><th>Poin penilaian</th><th>Status</th></tr></thead><tbody>' +
+      t.check.map((c, i) => '<tr><td class="rp-no">' + (i + 1) + '</td><td>' + esc(c) + '</td><td>' + (ok[i] ? '<span class="rp-ok">Terpenuhi</span>' : '<span class="rp-bad">Belum</span>') + '</td></tr>').join('') +
+      '</tbody></table></div></section>' +
+      '<footer class="rp-foot">Tes gambar dinilai oleh psikolog dalam tes sesungguhnya. Checklist ini hanya untuk latihan mandiri.</footer></article>';
+  }
   function reportHtml(e) {
+    if (e.draw) return drawReportHtml(e);
     const parts = e.sim ? e.parts : [e];
     const scores = parts.map(p => Object.assign({ id: p.id }, repScore(repItems(p))));
     const cor = scores.reduce((a, s) => a + s.correct, 0), tot = scores.reduce((a, s) => a + s.total, 0), pct = Math.round(cor / tot * 100);
@@ -905,9 +921,13 @@ details.sim-rev .rev { border-color: var(--line); }
     const qs = getQs(1, 'deret');
     return { sample: true, t: Date.now(), id: 'deret', code: 1, used: 21 * 60000 + 40000, ans: qs.map((q, i) => i % 7 === 3 ? (q[2] + 1) % q[1].length : i % 11 === 5 ? null : q[2]) };
   }
+  const IN_APP = (() => { try { return /Instagram|FBAN|FBAV|FB_IAB|Line\/|TikTok|musical_ly|Twitter|Snapchat|WhatsApp/i.test(navigator.userAgent); } catch (e) { return false; } })();
+  function inAppNote() {
+    return IN_APP ? '<div class="anon warnapp">' + shieldIcon + '<p><b>Kamu membuka web ini dari dalam aplikasi</b> (Instagram, WhatsApp, TikTok, dan sejenisnya). Di sini riwayat bisa hilang saat ditutup dan Export PDF sering tidak berjalan. Agar aman, buka di <b>Chrome</b> atau <b>Safari</b>: ketuk menu <b>⋮</b> atau <b>•••</b>, lalu pilih <b>Buka di browser</b>.<br><button class="btn btn-ghost btn-sm" data-act="copylink">Salin link web</button></p></div>' : '';
+  }
   function viewReport() {
     const e = S.report;
-    return '<div class="wrap"><div class="rp-bar no-print">' + topbar('<button class="btn btn-ghost btn-sm" data-act="repback">Kembali</button>') +
+    return '<div class="wrap"><div class="rp-bar no-print">' + topbar('<button class="btn btn-ghost btn-sm" data-act="repback">Kembali</button>') + inAppNote() +
       (e.sample ? '<div class="anon"><p><b>Ini contoh laporan</b> dengan jawaban rekaan. Laporanmu sendiri muncul setelah kamu menyelesaikan satu subtes atau simulasi lengkap.</p></div>' : '') +
       '<div class="card" style="gap:10px"><p><b>Simpan sebagai PDF:</b> tekan tombol di bawah, lalu di jendela cetak pilih <b>Simpan sebagai PDF</b> (Save as PDF) sebagai printer.</p>' +
       '<div class="actions"><button class="btn btn-primary" data-act="printnow">Export PDF</button><button class="btn btn-ghost" data-act="repback">Kembali</button></div>' +
@@ -948,7 +968,8 @@ details.sim-rev .rev { border-color: var(--line); }
     const key = S.code + ':' + id;
     if (!d.best[key] || pct > d.best[key].pct) d.best[key] = { pct, correct, total };
     d.hist.unshift({ t: Date.now(), name, correct, total, code: S.code, rep: rep || null });
-    d.hist = d.hist.slice(0, 8);
+    d.hist = d.hist.slice(0, 20);
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
     store.set(d);
   }
 
@@ -1017,7 +1038,7 @@ details.sim-rev .rev { border-color: var(--line); }
     const hist = d.hist.length ? '<div class="card"><div class="scroll-x"><table class="hist"><thead><tr><th>Waktu</th><th>Tes</th><th>Skor</th><th>%</th><th>PDF</th></tr></thead><tbody>' +
       d.hist.map((h, hi) => '<tr><td>' + esc(new Date(h.t).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</td><td>' + esc(h.name) + (h.code ? ' <span class="muted">· ' + esc(codeLabel(h.code)) + '</span>' : '') + '</td><td class="num">' + h.correct + '/' + h.total + '</td><td class="num">' + Math.round(h.correct / h.total * 100) + '%</td><td>' + (h.rep ? '<button class="btn btn-ghost btn-sm" data-act="exportpdf" data-v="' + hi + '">Export PDF</button>' : '<span class="muted" title="Riwayat lama tanpa detail jawaban">—</span>') + '</td></tr>').join('') +
       '</tbody></table></div></div>' : '<div class="card"><p class="muted">Belum ada riwayat. Selesaikan satu subtes dan skornya akan muncul di sini, hanya di perangkat ini.</p></div>';
-    return '<div class="wrap">' + topbar('<span class="chip">' + esc(today) + '</span>') +
+    return '<div class="wrap">' + topbar('<span class="chip">' + esc(today) + '</span>') + inAppNote() +
       '<section class="hero"><div class="hero-left"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="free-badge">100% Gratis</span><span class="eyebrow" style="color:var(--hero-muted)">Latihan tes berbasis komputer</span></div><h1>Simulasi Psikotes<em>by Aa Shendi Yusuf</em></h1>' +
       '<p class="hero-use">Psikotes ini umum digunakan dalam proses rekrutmen dan seleksi kerja, seperti saat melamar pekerjaan, seleksi BUMN, perusahaan swasta (BUMS), dan lainnya.</p>' +
       '<p>Kerjakan seperti tes sungguhan: ada batas waktu, bisa tandai ragu, dan jawaban baru dinilai setelah sesi berakhir. Skor dan soal yang salah muncul di akhir.</p>' +
@@ -1029,7 +1050,7 @@ details.sim-rev .rev { border-color: var(--line); }
       '<div class="codeinput"><label for="codeInput">Kode lain (1–999)</label><input id="codeInput" type="number" min="1" max="999" inputmode="numeric" placeholder="mis. 123" value="' + (S.code > CODES.length ? S.code : '') + '"><button class="btn btn-ghost btn-sm" data-act="usecode">Pakai kode</button><button class="btn btn-ghost btn-sm" data-act="randcode">Kode acak</button></div></section>' +
       '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Pilih subtes · ' + esc(codeLabel(S.code)) + '</h2><span class="muted" style="font-size:13px">Jawaban tidak dinilai sampai sesi selesai</span></div><div class="grid">' + cards + '</div></section>' +
       '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Tes gambar</h2><span class="muted" style="font-size:13px">Timer + checklist penilaian diri</span></div><div class="grid">' + drawCards + '</div></section>' +
-      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Riwayat terakhir</h2>' + (d.hist.length ? '<button class="btn btn-ghost btn-sm" data-act="askreset">Reset riwayat &amp; skor</button>' : '') + '</div>' + hist + '</section>' + donasi() + '</div>';
+      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Riwayat terakhir</h2>' + (d.hist.length ? '<button class="btn btn-ghost btn-sm" data-act="askreset">Reset riwayat &amp; skor</button>' : '') + '</div><p class="muted" style="font-size:13px">Riwayat (maks. 20) tersimpan di browser ini dan tetap bisa diekspor ke PDF walaupun web sudah ditutup. Riwayat akan hilang jika memakai mode samaran/incognito, menghapus data browser, atau membuka dari dalam aplikasi Instagram/WhatsApp.</p>' + hist + '</section>' + donasi() + '</div>';
   }
 
 
@@ -1405,6 +1426,7 @@ details.sim-rev .rev { border-color: var(--line); }
     samplereport() { openReport(sampleEntry()); },
     repback() { S.view = S.reportBack || 'home'; S.report = null; render(); window.scrollTo(0, 0); },
     printnow() { try { window.print(); } catch (e) { showToast('Jendela cetak tidak tersedia di sini. Buka web ini di Chrome atau Safari.'); } },
+    copylink() { const u = 'https://shendyu7-a11y.github.io/simulasi-psikotes/', ok = () => showToast('Link disalin. Tempel di Chrome atau Safari.'), no = () => showToast(u); try { navigator.clipboard.writeText(u).then(ok, no); } catch (e) { no(); } },
     pick(v) { const r = S.run; r.answers[r.order[r.cur]] = Number(v); render(); },
     go(v) { S.run.cur = Number(v); render(); },
     prev() { if (S.run.cur > 0) { S.run.cur--; render(); } },
@@ -1430,7 +1452,7 @@ details.sim-rev .rev { border-color: var(--line); }
     drawintro(v) { S.draw = { id: v }; S.view = 'drawintro'; render(); window.scrollTo(0, 0); },
     drawstart() { S.draw.endAt = Date.now() + DRAW[S.draw.id].minutes * 60000; S.draw.checked = []; S.draw.scored = false; S.draw.timeout = false; S.view = 'drawrun'; render(); startTick(); },
     drawdone() { stopTick(); S.view = 'drawcheck'; render(); },
-    drawscore() { S.draw.scored = true; const t = DRAW[S.draw.id]; record('draw-' + S.draw.id, t.name + ' (checklist)', S.draw.checked.filter(Boolean).length, t.check.length); render(); }
+    drawscore() { S.draw.scored = true; const t = DRAW[S.draw.id]; record('draw-' + S.draw.id, t.name + ' (checklist)', S.draw.checked.filter(Boolean).length, t.check.length, { draw: true, id: S.draw.id, checked: S.draw.checked.slice(), timeout: !!S.draw.timeout, t: Date.now() }); render(); }
   };
 
   app.addEventListener('click', e => {
