@@ -1,0 +1,780 @@
+<title>Trial Psikotest by Aa Shendi Yusuf</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: CBT exam console. Home = test cards; exam = question sheet + number panel; result = score + review. */
+/* Single white theme by request: white ground, black ink; green/red only for right/wrong. */
+:root {
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --ink: #111827;
+  --muted: #5B6472;
+  --line: #E3E6EA;
+  --chip: #F4F5F7;
+  --accent: #111827;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #F4F5F7;
+  --ok: #15803D;
+  --ok-soft: #E8F5EC;
+  --ragu: #C26A06;
+  --ragu-soft: #FCEFD9;
+  --ragu-text: #7A4100;
+  --danger: #B9342A;
+  --danger-soft: #FBE6E3;
+  --hero-bg: #FFFFFF;
+  --hero-ink: #111827;
+  --hero-muted: #5B6472;
+  --mark: rgba(17, 24, 39, 0.04);
+  --scrim: rgba(17, 24, 39, 0.45);
+  --font-ui: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 8px 56px; display: flex; flex-direction: column; gap: 24px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 14px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand-mark { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; letter-spacing: 0.02em; flex: none; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+.brand-text b { font-weight: 800; font-size: 15px; }
+.brand-text span { color: var(--muted); font-size: 12px; }
+.btn { appearance: none; border: 0; border-radius: 10px; padding: 11px 18px; font: 600 15px var(--font-ui); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; text-decoration: none; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-ghost { background: var(--chip); color: var(--ink); }
+.btn-ragu { background: var(--ragu-soft); color: var(--ragu-text); }
+.btn-ragu[aria-pressed="true"] { background: var(--ragu); color: #fff; }
+.btn-light { background: var(--hero-ink); color: var(--hero-bg); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-sm { min-height: 36px; padding: 7px 12px; font-size: 13px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.chip { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.bad { background: var(--danger-soft); color: var(--danger); }
+.chip.warn { background: var(--ragu-soft); color: var(--ragu-text); }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+/* Home */
+.hero { background: var(--hero-bg); color: var(--hero-ink); border: 1px solid var(--line); border-radius: 18px; padding: 28px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; align-items: end; }
+.hero h1 { font-size: clamp(30px, 5vw, 50px); font-weight: 800; letter-spacing: -0.025em; line-height: 1.02; }
+.hero h1 em { font-style: normal; color: var(--hero-muted); font-weight: 600; display: block; font-size: 0.42em; letter-spacing: 0; margin-top: 10px; }
+.hero p { color: var(--hero-muted); max-width: 52ch; }
+.hero-left { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.hero-right { display: flex; flex-direction: column; gap: 12px; background: var(--chip); border-radius: 14px; padding: 18px; min-width: 0; }
+.hero-right .row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--hero-muted); }
+.hero-right .row b { color: var(--hero-ink); font-family: var(--font-num); font-weight: 600; }
+.toggle { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.section-head h2 { font-size: 20px; font-weight: 800; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.test-card h3 { font-size: 18px; font-weight: 700; }
+.test-card .meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.test-card .foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 6px; }
+.best { font-size: 13px; color: var(--muted); }
+.best b { font-family: var(--font-num); color: var(--ink); }
+.hist { width: 100%; border-collapse: collapse; font-size: 14px; }
+.hist th, .hist td { text-align: left; padding: 10px 12px; border-top: 1px solid var(--line); }
+.hist th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; border-top: 0; }
+.hist td.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.scroll-x { overflow-x: auto; }
+
+/* Intro */
+.intro { max-width: 720px; margin: 0 auto; width: 100%; }
+.intro h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 800; letter-spacing: -0.02em; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.fact { background: var(--chip); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 2px; }
+.fact b { font-family: var(--font-num); font-size: 22px; font-weight: 600; }
+.fact span { font-size: 12px; color: var(--muted); }
+.rules { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Exam */
+.exam-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; flex-direction: column; gap: 10px; padding-block: 12px 0; }
+.exam-bar .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.exam-title { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.exam-title b { font-weight: 800; font-size: 16px; }
+.exam-title span { font-size: 12px; color: var(--muted); }
+.timer { font-family: var(--font-num); font-size: 20px; font-weight: 600; padding: 6px 14px; border-radius: 999px; background: var(--surface); border: 1.5px solid var(--line); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 8px; }
+.timer.warn { color: var(--danger); border-color: var(--danger); background: var(--danger-soft); }
+.timer svg { width: 16px; height: 16px; }
+.timebar { height: 4px; background: var(--chip); border-radius: 99px; overflow: hidden; }
+.timebar i { display: block; height: 100%; background: var(--accent); transition: width 0.25s linear; }
+.timebar.warn i { background: var(--danger); }
+.exam { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; }
+.qcard { position: relative; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.wm { position: absolute; inset: -60% -40%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 70px; transform: rotate(-32deg); pointer-events: none; user-select: none; color: var(--mark); font-weight: 800; font-size: 40px; white-space: nowrap; z-index: 0; }
+.qcard > *:not(.wm) { position: relative; z-index: 1; }
+.qlabel { color: var(--accent); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.qtext { font-size: 19px; font-weight: 600; line-height: 1.5; }
+.opts { display: flex; flex-direction: column; gap: 10px; }
+.opt { display: flex; align-items: center; gap: 14px; text-align: left; width: 100%; padding: 14px 16px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: 500 15px var(--font-ui); cursor: pointer; min-height: 54px; }
+.opt:hover { border-color: var(--muted); }
+.opt .dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--muted); flex: none; display: grid; place-items: center; }
+.opt b { font-weight: 700; }
+.opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.opt[aria-pressed="true"] .dot { border-color: var(--accent); }
+.opt[aria-pressed="true"] .dot::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.qnav { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; padding-top: 6px; }
+.qnav .group { display: flex; gap: 10px; flex-wrap: wrap; }
+.side { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; align-self: start; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 104px); min-width: 0; }
+.side h3 { font-size: 14px; font-weight: 700; }
+.numgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.num { min-height: 36px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font: 600 13px var(--font-num); cursor: pointer; padding: 0; }
+.num.done { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.num.ragu { background: var(--ragu-soft); border-color: var(--ragu); color: var(--ragu-text); }
+.num.cur { outline: 2px solid var(--ink); outline-offset: 1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid var(--line); display: inline-block; }
+.legend i.done { background: var(--accent); border-color: var(--accent); }
+.legend i.ragu { background: var(--ragu-soft); border-color: var(--ragu); }
+.counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; text-align: center; }
+.counts div { background: var(--chip); border-radius: 10px; padding: 8px 4px; display: flex; flex-direction: column; }
+.counts b { font-family: var(--font-num); font-size: 18px; }
+.counts span { font-size: 11px; color: var(--muted); }
+.kbd-hint { font-size: 12px; color: var(--muted); }
+
+/* Results */
+.score-card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: center; }
+.ring { width: 140px; height: 140px; position: relative; flex: none; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .val { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring .val b { font-family: var(--font-num); font-size: 30px; font-weight: 600; line-height: 1; }
+.ring .val span { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.score-info { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.score-info h1 { font-size: clamp(24px, 3.6vw, 32px); font-weight: 800; letter-spacing: -0.02em; }
+.stars { display: flex; gap: 4px; }
+.stars svg { width: 26px; height: 26px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--chip); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; }
+.stat b { font-family: var(--font-num); font-size: 20px; font-weight: 600; }
+.stat span { font-size: 12px; color: var(--muted); }
+.stat.ok b { color: var(--ok); } .stat.bad b { color: var(--danger); }
+.review { display: flex; flex-direction: column; gap: 12px; }
+.rev { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.rev-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rev-head b { font-family: var(--font-num); font-size: 13px; color: var(--muted); }
+.rev-q { font-weight: 600; }
+.ans-line { display: flex; gap: 8px; font-size: 14px; flex-wrap: wrap; }
+.ans-line .lbl { color: var(--muted); min-width: 120px; }
+.ans-line .wrong { color: var(--danger); font-weight: 600; text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.ans-line .right { color: var(--ok); font-weight: 700; }
+.expl { font-size: 14px; background: var(--chip); border-radius: 10px; padding: 10px 12px; }
+.filter { display: flex; gap: 6px; background: var(--chip); padding: 4px; border-radius: 10px; }
+.filter button { border: 0; background: transparent; color: var(--muted); font: 600 13px var(--font-ui); padding: 7px 12px; border-radius: 8px; cursor: pointer; min-height: 34px; }
+.filter button[aria-pressed="true"] { background: var(--surface); color: var(--ink); }
+details.sim-rev { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+details.sim-rev summary { padding: 16px 20px; cursor: pointer; font-weight: 700; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+details.sim-rev .review { padding: 0 16px 16px; }
+details.sim-rev .rev { border-color: var(--line); }
+
+/* Drawing */
+.bigtimer { font-family: var(--font-num); font-size: clamp(56px, 14vw, 104px); font-weight: 600; letter-spacing: -0.02em; text-align: center; font-variant-numeric: tabular-nums; line-height: 1; }
+.bigtimer.warn { color: var(--danger); }
+.wart { color: var(--ink); width: 100%; max-width: 520px; }
+.checklist { display: flex; flex-direction: column; gap: 10px; }
+.checklist label { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer; background: var(--surface); }
+.checklist input { width: 20px; height: 20px; margin-top: 1px; accent-color: var(--ink); flex: none; }
+
+/* Modal + toast */
+.overlay { position: fixed; inset: 0; background: var(--scrim); display: grid; place-items: center; z-index: 50; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.dialog { background: var(--surface); border-radius: 16px; padding: 24px; max-width: 440px; width: 100%; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+.dialog h2 { font-size: 20px; font-weight: 800; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 12px; font-weight: 600; z-index: 60; max-width: calc(100% - 32px); }
+
+@media (max-width: 860px) {
+  .exam { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; }
+  .numgrid { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+  .hero { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .qcard { padding: 20px; }
+  .qtext { font-size: 17px; }
+  .numgrid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .score-card { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
+  .score-info { align-items: center; }
+  .ring { width: 120px; height: 120px; }
+  .hero { padding: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { .timebar i { transition: none; } }
+</style>
+
+<div id="app"></div>
+
+<script>
+(function () {
+  const L = ['A', 'B', 'C', 'D', 'E'];
+  const PREMIS = ['Semua pernyataan benar', 'Salah pada pernyataan pertama', 'Salah pada pernyataan kedua', 'Pernyataan pertama dan kedua salah', 'Salah pada kesimpulan'];
+  const sin = (w, o, a) => ['Sinonim kata "' + w + '" adalah …', o, a, w + ' = ' + o[a].toLowerCase()];
+  const ant = (w, o, a) => ['Lawan kata "' + w + '" adalah …', o, a, 'Lawan kata ' + w.toLowerCase() + ' adalah ' + o[a].toLowerCase()];
+  const BB = 'Nilai kebenaran pernyataan berikut: ';
+
+  const TESTS = {
+    deret: {
+      name: 'Deret Angka', minutes: 15, target: 24,
+      desc: 'Tentukan angka atau huruf berikutnya pada setiap deret.',
+      qs: [
+        ['2, 6, 8, 24, 26, 78, …', ['79', '80', '82', '234', '240'], 1, '×3, +2 bergantian: 78 + 2 = 80'],
+        ['2, 5, 15, 18, 54, 57, …', ['60', '162', '168', '171', '174'], 3, '+3, ×3 bergantian: 57 × 3 = 171'],
+        ['10, 16, 30, 48, …, 144', ['66', '72', '84', '90', '96'], 3, 'Suku ganjil ×3 (10, 30, 90); suku genap ×3 (16, 48, 144)'],
+        ['12, 14, 18, 20, 24, 26, …, …', ['28, 30', '30, 32', '30, 34', '32, 34', '28, 32'], 1, '+2, +4 bergantian'],
+        ['20, 19, 23, 22, 26, 25, …, …', ['24, 28', '28, 27', '29, 28', '30, 29', '29, 33'], 2, '−1, +4 bergantian'],
+        ['4, 7, 12, 19, 28, …', ['37', '38', '39', '40', '41'], 2, '+3, +5, +7, +9, +11'],
+        ['3, 6, 12, 24, 48, …', ['72', '84', '90', '96', '100'], 3, 'Dikali 2'],
+        ['81, 27, 9, 3, …', ['0', '1', '2', '1/3', '3'], 1, 'Dibagi 3'],
+        ['1, 3, 6, 10, 15, …', ['21', '20', '22', '24', '25'], 0, '+2, +3, +4, +5, +6'],
+        ['2, 4, 4, 8, 6, 12, 8, …', ['10', '12', '14', '16', '18'], 3, 'Suku ganjil +2; suku genap +4 (4, 8, 12, 16)'],
+        ['100, 90, 81, 73, 66, …', ['58', '59', '60', '61', '62'], 2, '−10, −9, −8, −7, −6'],
+        ['5, 6, 8, 11, 15, 20, …', ['25', '27', '28', '24', '26'], 4, '+1, +2, +3, +4, +5, +6'],
+        ['1, 1, 2, 3, 5, 8, 13, …', ['18', '19', '20', '21', '26'], 3, 'Fibonacci: 8 + 13 = 21'],
+        ['7, 14, 11, 22, 19, 38, …', ['35', '36', '41', '76', '34'], 0, '×2, −3 bergantian'],
+        ['3, 9, 27, 81, …', ['162', '189', '216', '243', '324'], 3, 'Dikali 3'],
+        ['2, 5, 10, 17, 26, …', ['35', '36', '37', '38', '39'], 2, 'n² + 1 → 6² + 1 = 37'],
+        ['64, 32, 16, 8, …', ['2', '4', '6', '0', '1'], 1, 'Dibagi 2'],
+        ['1, 4, 9, 16, 25, 36, …', ['42', '45', '47', '48', '49'], 4, 'Bilangan kuadrat: 7² = 49'],
+        ['6, 11, 21, 36, 56, …', ['76', '78', '80', '81', '86'], 3, '+5, +10, +15, +20, +25'],
+        ['120, 60, 20, 5, …', ['1', '2', '2,5', '0', '4'], 0, '÷2, ÷3, ÷4, ÷5'],
+        ['2, 3, 5, 7, 11, 13, 17, …', ['18', '19', '20', '21', '23'], 1, 'Bilangan prima'],
+        ['1, 2, 6, 24, 120, …', ['240', '360', '600', '720', '840'], 3, '×2, ×3, ×4, ×5, ×6'],
+        ['50, 48, 44, 38, 30, …', ['18', '20', '21', '22', '24'], 1, '−2, −4, −6, −8, −10'],
+        ['9, 12, 10, 13, 11, 14, …', ['12', '15', '16', '17', '10'], 0, '+3, −2 bergantian'],
+        ['1, 8, 27, 64, 125, …', ['196', '200', '216', '225', '250'], 2, 'Bilangan kubik: 6³ = 216'],
+        ['4, 12, 10, 30, 28, …', ['82', '84', '86', '90', '56'], 1, '×3, −2 bergantian'],
+        ['A, C, E, G, I, …', ['J', 'K', 'L', 'M', 'H'], 1, 'Lompat satu huruf (+2)'],
+        ['B, E, H, K, N, …', ['O', 'P', 'Q', 'R', 'S'], 2, 'Maju 3 huruf'],
+        ['Z, X, U, Q, L, …', ['G', 'H', 'E', 'F', 'I'], 3, '−2, −3, −4, −5, −6 (L = 12 → 6 = F)'],
+        ['A, D, H, M, S, …', ['X', 'Y', 'Z', 'W', 'V'], 2, '+3, +4, +5, +6, +7 (S = 19 → 26 = Z)']
+      ]
+    },
+    cerita: {
+      name: 'Soal Cerita Matematika', minutes: 25, target: 20,
+      desc: 'Hitung tanpa kalkulator. Rumus yang dibutuhkan disebutkan di soal.',
+      qs: [
+        ['Rumus berat badan ideal bayi 0–12 bulan = (usia dalam bulan ÷ 2) + 4. Seorang bayi berusia 8 bulan. Berapa berat badan idealnya?', ['6 kg', '7 kg', '8 kg', '9 kg', '10 kg'], 2, '8 ÷ 2 + 4 = 8 kg'],
+        ['Rumus berat badan ideal anak 1–10 tahun = (usia dalam tahun × 2) + 8. Seorang anak berusia 6 tahun. Berapa berat badan idealnya?', ['20 kg', '18 kg', '22 kg', '16 kg', '24 kg'], 0, '6 × 2 + 8 = 20 kg'],
+        ['Rumus berat badan ideal dewasa = (tinggi badan dalam cm − 100) × 90%. Tinggi badan Pak Rudi 170 cm. Berapa berat badan idealnya?', ['60 kg', '61 kg', '63 kg', '65 kg', '70 kg'], 2, '(170 − 100) × 0,9 = 63 kg'],
+        ['Rumus berat badan ideal dewasa = (tinggi badan dalam cm − 100) × 90%. Berat badan ideal Sinta 58,5 kg. Berapa tinggi badannya?', ['165 cm', '160 cm', '162 cm', '168 cm', '170 cm'], 0, '58,5 ÷ 0,9 = 65 → 65 + 100 = 165 cm'],
+        ['Sebuah motor melaju 60 km/jam selama 2,5 jam. Berapa jarak yang ditempuh?', ['120 km', '135 km', '140 km', '150 km', '160 km'], 3, '60 × 2,5 = 150 km'],
+        ['Jarak 180 km ditempuh dalam 3 jam. Berapa kecepatan rata-ratanya?', ['50 km/jam', '55 km/jam', '60 km/jam', '65 km/jam', '70 km/jam'], 2, '180 ÷ 3 = 60 km/jam'],
+        ['Budi berangkat pukul 07.15. Perjalanannya 2 jam 50 menit. Pukul berapa ia tiba?', ['09.55', '10.05', '10.00', '10.15', '10.25'], 1, '07.15 + 2 jam 50 menit = 10.05'],
+        ['Harga 1 lusin pensil Rp36.000. Berapa harga 5 pensil?', ['Rp12.000', 'Rp15.000', 'Rp18.000', 'Rp20.000', 'Rp30.000'], 1, '36.000 ÷ 12 = 3.000 per pensil; × 5 = 15.000'],
+        ['Gaji Rina Rp4.500.000 per bulan dan 20% ditabung. Berapa tabungannya per bulan?', ['Rp800.000', 'Rp850.000', 'Rp900.000', 'Rp950.000', 'Rp1.000.000'], 2, '20% × 4.500.000 = 900.000'],
+        ['Sebuah tas seharga Rp250.000 mendapat diskon 30%. Berapa yang harus dibayar?', ['Rp165.000', 'Rp175.000', 'Rp180.000', 'Rp200.000', 'Rp225.000'], 1, '250.000 × 70% = 175.000'],
+        ['Pedagang membeli 20 kg beras seharga Rp240.000 dan menjualnya Rp14.000/kg. Berapa keuntungannya?', ['Rp20.000', 'Rp30.000', 'Rp40.000', 'Rp50.000', 'Rp60.000'], 2, '20 × 14.000 = 280.000; 280.000 − 240.000 = 40.000'],
+        ['Pedagang membeli beras seharga Rp240.000 dan menjual seluruhnya Rp280.000. Berapa persen keuntungannya?', ['16,7%', '14,3%', '15%', '20%', '25%'], 0, '40.000 ÷ 240.000 × 100% ≈ 16,7%'],
+        ['Enam mesin menyelesaikan pesanan dalam 20 hari. Berapa hari jika memakai 8 mesin?', ['12 hari', '14 hari', '16 hari', '15 hari', '18 hari'], 3, '6 × 20 = 8 × h → h = 15 hari'],
+        ['Keran A mengisi bak dalam 3 jam, keran B dalam 6 jam. Berapa jam jika keduanya dibuka bersama?', ['1,5 jam', '2 jam', '2,5 jam', '3 jam', '4,5 jam'], 1, '1/3 + 1/6 = 1/2 → 2 jam'],
+        ['Umur ayah 3 kali umur anaknya. Jumlah umur mereka 48 tahun. Berapa umur anak?', ['12 tahun', '10 tahun', '14 tahun', '16 tahun', '36 tahun'], 0, 'Anak = x, ayah = 3x; 4x = 48 → x = 12'],
+        ['Rata-rata 4 bilangan adalah 25. Setelah ditambah satu bilangan, rata-ratanya 28. Berapa bilangan yang ditambahkan?', ['30', '35', '40', '45', '48'], 2, '5 × 28 − 4 × 25 = 140 − 100 = 40'],
+        ['Kelereng A, B, dan C berbanding 2 : 3 : 5, jumlahnya 60 butir. Berapa kelereng C?', ['12', '18', '24', '30', '36'], 3, '5/10 × 60 = 30'],
+        ['Skala peta 1 : 500.000. Jarak dua kota di peta 4 cm. Berapa jarak sebenarnya?', ['2 km', '20 km', '200 km', '50 km', '5 km'], 1, '4 × 500.000 = 2.000.000 cm = 20 km'],
+        ['Sebuah lahan persegi panjang memiliki panjang 12 m dan lebar 8 m. Berapa kelilingnya?', ['96 m', '20 m', '40 m', '48 m', '80 m'], 2, '2 × (12 + 8) = 40 m'],
+        ['Sebuah mobil menghabiskan 1 liter bensin untuk 12 km. Berapa liter untuk perjalanan 300 km?', ['20 liter', '22 liter', '24 liter', '25 liter', '30 liter'], 3, '300 ÷ 12 = 25 liter'],
+        ['Sebuah lini produksi menghasilkan 480 unit dalam 8 jam. Berapa unit dalam 5 jam?', ['240', '280', '300', '320', '360'], 2, '480 ÷ 8 = 60 per jam; × 5 = 300'],
+        ['Uang Rp2.000.000 ditabung dengan bunga tunggal 6% per tahun. Berapa total uang setelah 1 tahun?', ['Rp2.060.000', 'Rp2.100.000', 'Rp2.160.000', 'Rp2.200.000', 'Rp2.120.000'], 4, 'Bunga 6% × 2.000.000 = 120.000; total 2.120.000'],
+        ['Sebuah kebun 1/4 bagiannya ditanami jagung, 2/5 cabai, dan sisanya 21 m² tomat. Berapa luas kebun?', ['40 m²', '50 m²', '60 m²', '70 m²', '84 m²'], 2, 'Sisa = 1 − 1/4 − 2/5 = 7/20; 21 ÷ 7/20 = 60 m²'],
+        ['Kota P dan Q berjarak 200 km. Pukul 08.00, A berangkat dari P ke Q dengan kecepatan 60 km/jam dan B dari Q ke P dengan kecepatan 40 km/jam. Pukul berapa mereka bertemu?', ['09.30', '10.00', '10.30', '11.00', '11.30'], 1, '200 ÷ (60 + 40) = 2 jam → pukul 10.00'],
+        ['Dari 480 karyawan, 75% hadir dalam rapat. Berapa karyawan yang tidak hadir?', ['120', '100', '110', '130', '360'], 0, '25% × 480 = 120']
+      ]
+    },
+    logika: {
+      name: 'Tes Logika', minutes: 20, target: 20,
+      desc: 'Jawab berdasarkan premis yang diberikan. Untuk soal benar-salah premis, nilai kebenarannya sesuai fakta umum.',
+      qs: [
+        ['Semua karyawan PT X wajib memakai helm di area produksi. Rudi adalah karyawan PT X yang sedang berada di area produksi. Jadi …', ['Rudi tidak wajib memakai helm', 'Rudi wajib memakai helm', 'Sebagian karyawan tidak memakai helm', 'Rudi adalah mandor', 'Tidak dapat ditarik kesimpulan'], 1, 'Semua karyawan wajib; Rudi karyawan, maka Rudi wajib memakai helm'],
+        ['Semua pemain basket bertubuh tinggi. Doni bertubuh tinggi. Jadi …', ['Doni pemain basket', 'Doni bukan pemain basket', 'Semua orang tinggi adalah pemain basket', 'Doni pemain voli', 'Tidak dapat ditarik kesimpulan'], 4, 'Orang tinggi belum tentu pemain basket'],
+        ['Semua burung bertelur. Sebagian hewan peliharaan adalah burung. Jadi …', ['Semua hewan peliharaan bertelur', 'Tidak ada hewan peliharaan yang bertelur', 'Sebagian hewan peliharaan bertelur', 'Semua yang bertelur adalah burung', 'Tidak dapat ditarik kesimpulan'], 2, 'Hewan peliharaan yang berupa burung pasti bertelur'],
+        ['Tidak ada ikan yang hidup di darat. Lele adalah ikan. Jadi …', ['Lele hidup di darat', 'Sebagian lele hidup di darat', 'Lele bisa hidup di darat dan di air', 'Lele tidak hidup di darat', 'Tidak dapat ditarik kesimpulan'], 3, 'Tidak ada ikan di darat; lele ikan'],
+        ['Jika listrik padam, mesin produksi berhenti. Mesin produksi tidak berhenti. Jadi …', ['Listrik padam', 'Listrik tidak padam', 'Mesin rusak', 'Produksi terganggu', 'Tidak dapat ditarik kesimpulan'], 1, 'Modus tollens: jika p maka q; tidak q, maka tidak p'],
+        ['Jika hujan, Andi membawa payung. Andi membawa payung. Jadi …', ['Hari ini hujan', 'Hari ini tidak hujan', 'Andi selalu membawa payung', 'Andi kehujanan', 'Tidak dapat ditarik kesimpulan'], 4, 'Andi bisa membawa payung karena alasan lain'],
+        ['Semua siswa kelas A pandai menyanyi. Rina adalah siswa kelas B. Jadi …', ['Tidak dapat ditarik kesimpulan', 'Rina tidak pandai menyanyi', 'Rina pandai menyanyi', 'Mustahil Rina pandai menyanyi', 'Meskipun kelas B, Rina pasti pandai menyanyi'], 0, 'Premis hanya membahas siswa kelas A'],
+        ['Negasi dari "Semua mesin di pabrik sudah dirawat" adalah …', ['Semua mesin di pabrik belum dirawat', 'Tidak ada mesin yang dirawat', 'Ada mesin di pabrik yang belum dirawat', 'Sebagian mesin sudah dirawat', 'Mesin di pabrik tidak perlu dirawat'], 2, 'Negasi "semua" adalah "ada yang tidak"'],
+        ['Jika rajin berlatih, maka juara. Jika juara, maka mendapat hadiah. Jadi …', ['Jika mendapat hadiah, maka rajin berlatih', 'Jika rajin berlatih, maka mendapat hadiah', 'Jika tidak berlatih, maka tidak mendapat hadiah', 'Juara tidak selalu mendapat hadiah', 'Tidak dapat ditarik kesimpulan'], 1, 'Silogisme: p → q dan q → r, maka p → r'],
+        ['Semua perawat teliti. Sebagian perawat adalah laki-laki. Jadi …', ['Semua laki-laki teliti', 'Semua perawat laki-laki', 'Tidak ada perempuan yang teliti', 'Sebagian laki-laki teliti', 'Tidak dapat ditarik kesimpulan'], 3, 'Perawat laki-laki pasti teliti, jadi sebagian laki-laki teliti'],
+        ['Dimas ingin lulus kuliah sebelum bekerja. Ia ingin menikah setelah membeli rumah. Ia ingin membeli mobil setelah bekerja tetapi sebelum membeli rumah. Mana urutan yang tepat?', ['Lulus – bekerja – mobil – rumah – menikah', 'Lulus – bekerja – rumah – mobil – menikah', 'Bekerja – lulus – mobil – rumah – menikah', 'Lulus – mobil – bekerja – rumah – menikah', 'Lulus – bekerja – mobil – menikah – rumah'], 0, 'Lulus → bekerja → mobil → rumah → menikah'],
+        ['Ani lebih tinggi dari Budi. Cici lebih pendek dari Budi. Dedi lebih tinggi dari Ani. Siapa yang paling pendek?', ['Ani', 'Budi', 'Cici', 'Dedi', 'Tidak dapat ditentukan'], 2, 'Urutan tinggi: Dedi, Ani, Budi, Cici'],
+        ['Lima orang mengantre. P di belakang Q. R di depan Q. S paling belakang. T berada di antara R dan Q. Siapa yang paling depan?', ['P', 'Q', 'R', 'S', 'T'], 2, 'Urutan antre: R, T, Q, P, S'],
+        ['Lima orang mengantre. P di belakang Q. R di depan Q. S paling belakang. T berada di antara R dan Q. Siapa yang berada di urutan ketiga dari depan?', ['P', 'Q', 'R', 'S', 'T'], 1, 'Urutan antre: R, T, Q, P, S'],
+        ['Hari ini hari Rabu. Hari apakah 100 hari lagi?', ['Kamis', 'Jumat', 'Sabtu', 'Minggu', 'Senin'], 1, '100 = 14 × 7 + 2 → Rabu + 2 hari = Jumat'],
+        ['Jika KERJA ditulis LFSKB, maka MESIN ditulis …', ['NFTJO', 'NFTIO', 'LDRHM', 'NETJO', 'MFTJO'], 0, 'Setiap huruf maju satu'],
+        ['Tiga orang menyelesaikan 3 pekerjaan dalam 3 hari. Berapa hari yang dibutuhkan 6 orang untuk menyelesaikan 6 pekerjaan yang sama?', ['1 hari', '3 hari', '6 hari', '9 hari', '12 hari'], 1, 'Satu orang menyelesaikan satu pekerjaan dalam 3 hari'],
+        [BB + 'Semua logam menghantarkan listrik. Tembaga adalah logam. Jadi, tembaga menghantarkan listrik.', PREMIS, 0, 'Semua pernyataan benar'],
+        [BB + 'Semua hewan berkaki empat adalah mamalia. Buaya adalah hewan berkaki empat. Jadi, buaya adalah mamalia.', PREMIS, 1, 'Buaya berkaki empat tetapi reptil, jadi pernyataan pertama salah'],
+        [BB + 'Semua karyawan wajib hadir dalam rapat hari Senin. Sinta adalah karyawan. Jadi, Sinta tidak wajib hadir dalam rapat hari Senin.', PREMIS, 4, 'Kesimpulan bertentangan dengan premis'],
+        [BB + 'Semua planet mengelilingi matahari. Bulan adalah planet. Jadi, bulan mengelilingi matahari.', PREMIS, 2, 'Bulan adalah satelit, bukan planet'],
+        [BB + 'Semua ikan bernapas dengan paru-paru. Paus adalah ikan. Jadi, paus bernapas dengan paru-paru.', PREMIS, 3, 'Ikan bernapas dengan insang, dan paus adalah mamalia'],
+        [BB + 'Semua bilangan genap habis dibagi 2. Angka 14 adalah bilangan genap. Jadi, 14 habis dibagi 2.', PREMIS, 0, 'Semua pernyataan benar'],
+        [BB + 'Perusahaan hanya menerima pelamar minimal lulusan D3. Rina lulusan SMA. Jadi, Rina diterima di perusahaan tersebut.', PREMIS, 4, 'Rina tidak memenuhi syarat minimal D3'],
+        [BB + 'Semua segitiga memiliki empat sisi. Persegi adalah segitiga. Jadi, persegi memiliki empat sisi.', PREMIS, 3, 'Segitiga bersisi tiga, dan persegi bukan segitiga']
+      ]
+    },
+    sinonim: {
+      name: 'Sinonim', minutes: 8, target: 24,
+      desc: 'Pilih kata yang paling dekat artinya.',
+      qs: [
+        sin('Abrasi', ['Pengendapan', 'Pengikisan', 'Penimbunan', 'Pencemaran', 'Penguapan'], 1),
+        sin('Absah', ['Batal', 'Lengkap', 'Sah', 'Tunda', 'Ragu'], 2),
+        sin('Agunan', ['Pinjaman', 'Bunga', 'Cicilan', 'Jaminan', 'Tabungan'], 3),
+        sin('Akurat', ['Cepat', 'Tepat', 'Lambat', 'Kira-kira', 'Ragu'], 1),
+        sin('Andal', ['Tangguh', 'Lemah', 'Ragu', 'Biasa', 'Malas'], 0),
+        sin('Arogan', ['Rendah hati', 'Pemalu', 'Ramah', 'Sombong', 'Penakut'], 3),
+        sin('Bahari', ['Gunung', 'Hutan', 'Laut', 'Sungai', 'Udara'], 2),
+        sin('Bahtera', ['Rumah', 'Perahu', 'Jembatan', 'Pelabuhan', 'Ombak'], 1),
+        sin('Berdikari', ['Bergantung', 'Bersatu', 'Berjuang', 'Berkembang', 'Mandiri'], 4),
+        sin('Akselerasi', ['Percepatan', 'Perlambatan', 'Perpindahan', 'Perubahan', 'Pengereman'], 0),
+        sin('Afeksi', ['Amarah', 'Kasih sayang', 'Kecemasan', 'Kesedihan', 'Kebencian'], 1),
+        sin('Asumsi', ['Fakta', 'Kesimpulan', 'Anggapan', 'Bukti', 'Hasil'], 2),
+        sin('Barbar', ['Sopan', 'Modern', 'Pemberani', 'Asing', 'Tidak beradab'], 4),
+        sin('Anulir', ['Sahkan', 'Batalkan', 'Tunda', 'Ulangi', 'Setujui'], 1),
+        sin('Evaluasi', ['Penilaian', 'Perencanaan', 'Pelaksanaan', 'Pelaporan', 'Pengawasan'], 0),
+        sin('Kendala', ['Peluang', 'Tujuan', 'Rencana', 'Hambatan', 'Bantuan'], 3),
+        sin('Mutakhir', ['Kuno', 'Terbaru', 'Lama', 'Klasik', 'Usang'], 1),
+        sin('Nisbi', ['Mutlak', 'Pasti', 'Relatif', 'Tetap', 'Sama'], 2),
+        sin('Pakar', ['Ahli', 'Pemula', 'Murid', 'Pekerja', 'Pemimpin'], 0),
+        sin('Konklusi', ['Pendahuluan', 'Isi', 'Kesimpulan', 'Rumusan', 'Saran'], 2),
+        sin('Vakum', ['Penuh', 'Ramai', 'Bergerak', 'Hampa', 'Panas'], 3),
+        sin('Prestise', ['Kewibawaan', 'Kekayaan', 'Kemiskinan', 'Kekuasaan', 'Keberanian'], 0),
+        sin('Rasional', ['Emosional', 'Masuk akal', 'Khayal', 'Ragu', 'Mistis'], 1),
+        sin('Kontemporer', ['Kuno', 'Abadi', 'Tradisional', 'Sementara', 'Masa kini'], 4),
+        sin('Insinuasi', ['Pujian', 'Sindiran', 'Ajakan', 'Perintah', 'Pertanyaan'], 1),
+        sin('Imbas', ['Sebab', 'Usaha', 'Dampak', 'Tujuan', 'Rencana'], 2),
+        sin('Kudapan', ['Makanan pokok', 'Minuman', 'Makanan ringan', 'Lauk', 'Bumbu'], 2),
+        sin('Lugas', ['Berbelit-belit', 'Apa adanya', 'Rumit', 'Samar', 'Kasar'], 1),
+        sin('Silih', ['Ganti', 'Tambah', 'Hilang', 'Kurang', 'Pindah'], 0),
+        sin('Wahana', ['Tujuan', 'Sarana', 'Hambatan', 'Hasil', 'Pemimpin'], 1)
+      ]
+    },
+    antonim: {
+      name: 'Antonim', minutes: 8, target: 24,
+      desc: 'Pilih kata yang paling berlawanan artinya. Waspadai opsi yang justru sinonimnya.',
+      qs: [
+        ant('Abstrak', ['Semu', 'Konkret', 'Maya', 'Khayal', 'Teori'], 1),
+        ant('Absurd', ['Janggal', 'Aneh', 'Masuk akal', 'Mustahil', 'Lucu'], 2),
+        ant('Arogan', ['Sombong', 'Angkuh', 'Congkak', 'Rendah hati', 'Tinggi hati'], 3),
+        ant('Agresif', ['Pasif', 'Aktif', 'Galak', 'Berani', 'Kasar'], 0),
+        ant('Defisit', ['Rugi', 'Kurang', 'Utang', 'Surplus', 'Minus'], 3),
+        ant('Dinamis', ['Aktif', 'Statis', 'Bergerak', 'Lincah', 'Energik'], 1),
+        ant('Ekspor', ['Impor', 'Kirim', 'Jual', 'Dagang', 'Produksi'], 0),
+        ant('Fiksi', ['Khayalan', 'Rekaan', 'Dongeng', 'Cerita', 'Fakta'], 4),
+        ant('Heterogen', ['Beragam', 'Campuran', 'Majemuk', 'Homogen', 'Berbeda'], 3),
+        ant('Implisit', ['Tersirat', 'Eksplisit', 'Samar', 'Tersembunyi', 'Rahasia'], 1),
+        ant('Kawan', ['Teman', 'Sahabat', 'Lawan', 'Rekan', 'Mitra'], 2),
+        ant('Maksimal', ['Optimal', 'Minimal', 'Tertinggi', 'Penuh', 'Puncak'], 1),
+        ant('Mayoritas', ['Sebagian besar', 'Banyak', 'Minoritas', 'Umum', 'Dominan'], 2),
+        ant('Modern', ['Baru', 'Kini', 'Mutakhir', 'Kuno', 'Canggih'], 3),
+        ant('Objektif', ['Netral', 'Subjektif', 'Adil', 'Jujur', 'Nyata'], 1),
+        ant('Optimis', ['Yakin', 'Percaya diri', 'Pesimis', 'Semangat', 'Gigih'], 2),
+        ant('Permanen', ['Tetap', 'Abadi', 'Kekal', 'Temporer', 'Kokoh'], 3),
+        ant('Rajin', ['Tekun', 'Malas', 'Giat', 'Ulet', 'Cermat'], 1),
+        ant('Sukarela', ['Ikhlas', 'Rela', 'Terpaksa', 'Senang', 'Sudi'], 2),
+        ant('Vertikal', ['Tegak', 'Lurus', 'Miring', 'Horizontal', 'Tinggi'], 3),
+        ant('Kikir', ['Pelit', 'Dermawan', 'Hemat', 'Boros', 'Kaya'], 1),
+        ant('Pro', ['Setuju', 'Dukung', 'Kontra', 'Pihak', 'Netral'], 2),
+        ant('Mikro', ['Kecil', 'Makro', 'Sedikit', 'Halus', 'Mini'], 1),
+        ant('Statis', ['Diam', 'Tetap', 'Dinamis', 'Pasif', 'Kaku'], 2),
+        ant('Prolog', ['Pembuka', 'Epilog', 'Dialog', 'Monolog', 'Katalog'], 1),
+        ant('Sporadis', ['Jarang', 'Kadang-kadang', 'Acak', 'Terus-menerus', 'Tersebar'], 3),
+        ant('Superior', ['Unggul', 'Hebat', 'Inferior', 'Tinggi', 'Utama'], 2),
+        ant('Konvergen', ['Divergen', 'Memusat', 'Bertemu', 'Berkumpul', 'Sejajar'], 0),
+        ant('Ilegal', ['Liar', 'Gelap', 'Legal', 'Terlarang', 'Haram'], 2),
+        ant('Antagonis', ['Penjahat', 'Protagonis', 'Lawan', 'Tokoh', 'Pemeran'], 1)
+      ]
+    }
+  };
+  const ORDER = ['deret', 'cerita', 'logika', 'sinonim', 'antonim'];
+
+  const DRAW = {
+    wartegg: {
+      name: 'Tes Wartegg', minutes: 25,
+      steps: ['Gambar 8 kotak berukuran sekitar 4 × 4 cm di kertas A4, lalu salin stimulus di bawah ke tiap kotak.', 'Lanjutkan setiap stimulus menjadi gambar yang bermakna. Stimulus harus menjadi bagian gambar.', 'Isi kedelapan kotak dengan objek yang berbeda-beda. Urutan pengerjaan bebas.', 'Catat nomor urutan pengerjaan di atas kotak dan beri judul singkat di bawahnya.'],
+      check: ['Kedelapan kotak terisi', 'Setiap stimulus dipakai sebagai bagian gambar', 'Objek di tiap kotak berbeda', 'Gambar jelas dan bermakna, bukan coretan', 'Setiap kotak diberi judul', 'Urutan pengerjaan dicatat', 'Selesai sebelum waktu habis']
+    },
+    orang: {
+      name: 'Tes Gambar Orang', minutes: 10,
+      steps: ['Gambarlah seorang manusia secara utuh, dari kepala sampai kaki.', 'Jangan menggambar kartun, tokoh anime, atau orang lidi.', 'Setelah selesai, tulis di balik kertas: nama tokoh, usia, pekerjaan, sedang melakukan apa, dan harapannya.'],
+      check: ['Orang digambar utuh dari kepala sampai kaki', 'Bukan orang lidi atau kartun', 'Wajah lengkap: mata, alis, hidung, mulut, telinga, rambut', 'Kedua tangan berjari dan kedua kaki terlihat jelas', 'Pakaian digambar dengan detail sederhana', 'Gambar di tengah dan memakai sekitar 2/3 kertas', 'Keterangan tokoh ditulis lengkap', 'Selesai sebelum waktu habis']
+    },
+    pohon: {
+      name: 'Tes Gambar Pohon', minutes: 10,
+      steps: ['Gambarlah sebatang pohon berkayu, selain pohon kelapa, pisang, atau bambu.', 'Gambar pohon secara utuh di tengah kertas.'],
+      check: ['Pohon berkayu, bukan kelapa, pisang, atau bambu', 'Ada akar atau garis tanah', 'Batang kokoh dengan cabang', 'Daun atau mahkota pohon rimbun', 'Gambar di tengah dan memakai sekitar 2/3 kertas', 'Garis tegas, tidak banyak menghapus', 'Selesai sebelum waktu habis']
+    }
+  };
+
+  const KEY = 'trialPsikotest.v1';
+  const store = {
+    get() { try { const v = JSON.parse(localStorage.getItem(KEY)); return v && v.best ? v : { best: {}, hist: [] }; } catch (e) { return { best: {}, hist: [] }; } },
+    set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} }
+  };
+  function record(id, name, correct, total) {
+    const d = store.get();
+    const pct = Math.round(correct / total * 100);
+    if (!d.best[id] || pct > d.best[id].pct) d.best[id] = { pct, correct, total };
+    d.hist.unshift({ t: Date.now(), name, correct, total });
+    d.hist = d.hist.slice(0, 8);
+    store.set(d);
+  }
+
+  let S = { view: 'home', shuffle: false, pending: null, run: null, result: null, sim: null, modal: null, reviewAll: false, draw: null, toast: '' };
+  const app = document.getElementById('app');
+  let tick = null, toastT = null;
+
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const fmt = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+  const fmtUsed = ms => { const s = Math.round(ms / 1000); return Math.floor(s / 60) + ' mnt ' + (s % 60) + ' dtk'; };
+  const today = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const totalSoal = ORDER.reduce((a, k) => a + TESTS[k].qs.length, 0);
+  const totalMin = ORDER.reduce((a, k) => a + TESTS[k].minutes, 0);
+  const clockIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  const starSvg = on => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="' + (on ? 'var(--ragu)' : 'none') + '" stroke="' + (on ? 'var(--ragu)' : 'var(--line)') + '" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  const starsFor = p => p >= 90 ? 3 : p >= 80 ? 2 : p >= 60 ? 1 : 0;
+  const levelFor = p => p >= 90 ? 'Sangat baik' : p >= 80 ? 'Baik, lolos target' : p >= 60 ? 'Cukup, perlu latihan lagi' : 'Perlu banyak latihan';
+
+  function shuffleArr(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+  function topbar(right) {
+    return '<header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">TP</div><div class="brand-text"><b>Trial Psikotest</b><span>by Aa Shendi Yusuf</span></div></div>' + (right || '') + '</header>';
+  }
+
+  function viewHome() {
+    const d = store.get();
+    const cards = ORDER.map(k => {
+      const t = TESTS[k], b = d.best[k];
+      return '<article class="card test-card"><span class="eyebrow">Subtes</span><h3>' + esc(t.name) + '</h3><p class="muted">' + esc(t.desc) + '</p>' +
+        '<div class="meta"><span class="chip">' + t.qs.length + ' soal</span><span class="chip">' + t.minutes + ' menit</span><span class="chip">Target ' + t.target + ' benar</span></div>' +
+        '<div class="foot"><span class="best">Skor terbaik: <b>' + (b ? b.correct + '/' + b.total : '—') + '</b></span><button class="btn btn-primary btn-sm" data-act="intro" data-v="' + k + '">Mulai</button></div></article>';
+    }).join('');
+    const drawCards = Object.keys(DRAW).map(k => {
+      const t = DRAW[k];
+      return '<article class="card test-card"><span class="eyebrow">Tes gambar</span><h3>' + esc(t.name) + '</h3><p class="muted">Kerjakan di kertas dengan timer, lalu nilai sendiri dengan checklist.</p>' +
+        '<div class="meta"><span class="chip">' + t.minutes + ' menit</span><span class="chip">Checklist ' + t.check.length + ' poin</span></div>' +
+        '<div class="foot"><span class="best">Kertas A4 + pensil</span><button class="btn btn-ghost btn-sm" data-act="drawintro" data-v="' + k + '">Mulai</button></div></article>';
+    }).join('');
+    const hist = d.hist.length ? '<div class="card"><div class="scroll-x"><table class="hist"><thead><tr><th>Waktu</th><th>Tes</th><th>Skor</th><th>%</th></tr></thead><tbody>' +
+      d.hist.map(h => '<tr><td>' + esc(new Date(h.t).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</td><td>' + esc(h.name) + '</td><td class="num">' + h.correct + '/' + h.total + '</td><td class="num">' + Math.round(h.correct / h.total * 100) + '%</td></tr>').join('') +
+      '</tbody></table></div></div>' : '<div class="card"><p class="muted">Belum ada riwayat. Selesaikan satu subtes dan skornya akan muncul di sini, hanya di perangkat ini.</p></div>';
+    return '<div class="wrap">' + topbar('<span class="chip">' + esc(today) + '</span>') +
+      '<section class="hero"><div class="hero-left"><span class="eyebrow" style="color:var(--hero-muted)">Simulasi tes berbasis komputer</span><h1>Trial Psikotest<em>by Aa Shendi Yusuf</em></h1>' +
+      '<p>Kerjakan seperti tes sungguhan: ada batas waktu, bisa tandai ragu, dan jawaban baru dinilai setelah sesi berakhir. Skor dan soal yang salah muncul di akhir.</p>' +
+      '<div class="actions"><button class="btn btn-primary" data-act="sim">Mulai Simulasi Lengkap</button></div></div>' +
+      '<div class="hero-right"><div class="row"><span>Subtes</span><b>' + ORDER.length + '</b></div><div class="row"><span>Total soal</span><b>' + totalSoal + '</b></div><div class="row"><span>Total waktu</span><b>' + totalMin + ' menit</b></div>' +
+      '<label class="toggle" style="color:var(--hero-ink)"><input type="checkbox" id="shuffle" ' + (S.shuffle ? 'checked' : '') + '> Acak urutan soal</label></div></section>' +
+      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Pilih subtes</h2><span class="muted" style="font-size:13px">Jawaban tidak dinilai sampai sesi selesai</span></div><div class="grid">' + cards + '</div></section>' +
+      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Tes gambar</h2><span class="muted" style="font-size:13px">Timer + checklist penilaian diri</span></div><div class="grid">' + drawCards + '</div></section>' +
+      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Riwayat terakhir</h2>' + (d.hist.length ? '<button class="btn btn-ghost btn-sm" data-act="askreset">Reset riwayat &amp; skor</button>' : '') + '</div>' + hist + '</section></div>';
+  }
+
+  function viewIntro() {
+    const k = S.pending, t = TESTS[k];
+    const simInfo = S.sim ? '<span class="chip ok">Simulasi lengkap · kategori ' + (S.sim.idx + 1) + ' dari ' + ORDER.length + '</span>' : '';
+    return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="' + (S.sim ? 'askexit' : 'home') + '">' + (S.sim ? 'Keluar simulasi' : 'Kembali') + '</button>') +
+      '<section class="card intro" style="padding:28px;gap:18px">' + simInfo + '<span class="eyebrow">Petunjuk kategori</span><h1>' + esc(t.name) + '</h1><p class="muted">' + esc(t.desc) + '</p>' +
+      '<div class="facts"><div class="fact"><b>' + t.qs.length + '</b><span>soal pilihan ganda</span></div><div class="fact"><b>' + t.minutes + ':00</b><span>menit waktu kerja</span></div><div class="fact"><b>' + t.target + '</b><span>target jawaban benar</span></div></div>' +
+      '<ol class="rules"><li>Pilih satu jawaban (A–E) di setiap soal. Jawaban bisa diubah selama waktu masih berjalan.</li><li>Pindah soal lewat tombol atau nomor soal di panel. Gunakan <b>Tandai Ragu</b> untuk soal yang ingin dicek ulang.</li><li>Benar atau salah tidak ditampilkan selama tes. Skor dan pembahasan muncul setelah kategori selesai.</li><li>Saat waktu habis, kategori otomatis selesai dan soal kosong dihitung salah.</li><li>Keyboard: tombol A–E atau 1–5 untuk memilih, panah kiri/kanan untuk pindah soal.</li></ol>' +
+      '<div class="actions"><button class="btn btn-primary" data-act="start">Mulai Tes</button></div></section></div>';
+  }
+
+  function counts() {
+    const r = S.run, n = TESTS[r.id].qs.length;
+    const done = Object.keys(r.answers).length, ragu = Object.values(r.ragu).filter(Boolean).length;
+    return { n, done, ragu, empty: n - done };
+  }
+
+  function viewExam() {
+    const r = S.run, t = TESTS[r.id], pos = r.cur, qi = r.order[pos], q = t.qs[qi], n = r.order.length;
+    const chosen = r.answers[qi];
+    const rem = r.endAt - Date.now(), warn = rem < 60000;
+    const pct = Math.max(0, rem / (t.minutes * 60000) * 100);
+    const c = counts();
+    const wmLine = 'Aa Shendi Yusuf · ' + today + ' · Trial Psikotest';
+    const wm = '<div class="wm" aria-hidden="true">' + new Array(7).fill('<span>' + esc(wmLine) + '</span>').join('') + '</div>';
+    const opts = q[1].map((o, i) => '<button class="opt" data-act="pick" data-v="' + i + '" aria-pressed="' + (chosen === i) + '"><span class="dot"></span><span><b>' + L[i] + '.</b> ' + esc(o) + '</span></button>').join('');
+    const nums = r.order.map((qq, p) => {
+      const cls = ['num']; if (r.ragu[qq]) cls.push('ragu'); else if (r.answers[qq] !== undefined) cls.push('done'); if (p === pos) cls.push('cur');
+      return '<button class="' + cls.join(' ') + '" data-act="go" data-v="' + p + '" aria-label="Soal ' + (p + 1) + '">' + (p + 1) + '</button>';
+    }).join('');
+    const last = pos === n - 1;
+    const simTag = S.sim ? ' · Kategori ' + (S.sim.idx + 1) + '/' + ORDER.length : '';
+    return '<div class="wrap" style="gap:18px"><div class="exam-bar"><div class="row"><div class="exam-title"><b>' + esc(t.name) + '</b><span>Trial Psikotest' + simTag + ' · ' + c.done + ' dari ' + n + ' terjawab</span></div>' +
+      '<div style="display:flex;gap:10px;align-items:center"><span class="timer' + (warn ? ' warn' : '') + '" id="timer" role="timer" aria-label="Sisa waktu">' + clockIcon + '<span id="timerTxt">' + fmt(rem) + '</span></span><button class="btn btn-ghost btn-sm" data-act="askrestart">Ulangi</button><button class="btn btn-ghost btn-sm" data-act="askexit">Keluar</button></div></div>' +
+      '<div class="timebar' + (warn ? ' warn' : '') + '" id="timebar"><i style="width:' + pct.toFixed(2) + '%"></i></div></div>' +
+      '<div class="exam"><section class="qcard">' + wm + '<div class="qlabel">Soal ' + (pos + 1) + ' dari ' + n + (r.ragu[qi] ? '<span class="chip warn">Ditandai ragu</span>' : '') + '</div>' +
+      '<p class="qtext">' + esc(q[0]) + '</p><div class="opts" role="group" aria-label="Pilihan jawaban">' + opts + '</div>' +
+      '<div class="qnav"><button class="btn btn-ghost" data-act="prev" ' + (pos === 0 ? 'disabled' : '') + '>← Sebelumnya</button><div class="group"><button class="btn btn-ragu" data-act="ragu" aria-pressed="' + (!!r.ragu[qi]) + '">' + (r.ragu[qi] ? 'Hapus Tanda Ragu' : 'Tandai Ragu') + '</button>' +
+      (last ? '<button class="btn btn-primary" data-act="askfinish">Selesai Kategori</button>' : '<button class="btn btn-primary" data-act="next">Selanjutnya →</button>') + '</div></div></section>' +
+      '<aside class="side"><h3>Nomor soal</h3><div class="numgrid">' + nums + '</div><div class="legend"><span><i class="done"></i>Dijawab</span><span><i class="ragu"></i>Ragu</span><span><i></i>Kosong</span></div>' +
+      '<div class="counts"><div><b>' + c.done + '</b><span>Dijawab</span></div><div><b>' + c.ragu + '</b><span>Ragu</span></div><div><b>' + c.empty + '</b><span>Kosong</span></div></div>' +
+      '<button class="btn btn-primary" data-act="askfinish">Selesai Kategori</button><p class="kbd-hint">Pintasan: A–E pilih jawaban, ← → pindah soal</p></aside></div></div>';
+  }
+
+  function ringSvg(p) {
+    const r = 54, c = 2 * Math.PI * r, off = c * (1 - p / 100);
+    return '<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="' + r + '" fill="none" stroke="var(--chip)" stroke-width="10"/><circle cx="60" cy="60" r="' + r + '" fill="none" stroke="' + (p >= 80 ? 'var(--ok)' : p >= 60 ? 'var(--ragu)' : 'var(--danger)') + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"/></svg>';
+  }
+
+  function reviewList(res, all) {
+    const items = res.items.filter(x => all || x.chosen !== x.q[2]);
+    if (!items.length) return '<div class="card"><p><b>Semua jawaban benar.</b> Tidak ada soal yang perlu dibahas.</p></div>';
+    return items.map(x => {
+      const ok = x.chosen === x.q[2], blank = x.chosen === null;
+      const pill = ok ? '<span class="chip ok">Benar</span>' : blank ? '<span class="chip warn">Tidak dijawab</span>' : '<span class="chip bad">Salah</span>';
+      const yours = blank ? '<span class="muted">—</span>' : '<span class="' + (ok ? 'right' : 'wrong') + '">' + L[x.chosen] + '. ' + esc(x.q[1][x.chosen]) + '</span>';
+      return '<article class="rev"><div class="rev-head"><b>SOAL NO. ' + (x.i + 1) + '</b>' + pill + '</div><p class="rev-q">' + esc(x.q[0]) + '</p>' +
+        '<div class="ans-line"><span class="lbl">Jawaban kamu</span>' + yours + '</div>' +
+        (ok ? '' : '<div class="ans-line"><span class="lbl">Jawaban benar</span><span class="right">' + L[x.q[2]] + '. ' + esc(x.q[1][x.q[2]]) + '</span></div>') +
+        '<p class="expl"><b>Pembahasan:</b> ' + esc(x.q[3]) + '</p></article>';
+    }).join('');
+  }
+
+  function viewResult() {
+    const res = S.result, t = TESTS[res.id], p = Math.round(res.correct / res.total * 100), st = starsFor(p), pass = res.correct >= t.target;
+    return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="home">Beranda</button>') +
+      '<section class="card score-card" style="padding:28px"><div class="ring">' + ringSvg(p) + '<div class="val"><b>' + res.correct + '/' + res.total + '</b><span>' + p + '%</span></div></div>' +
+      '<div class="score-info"><span class="eyebrow">Hasil · ' + esc(t.name) + '</span><h1>' + esc(levelFor(p)) + '</h1><div class="stars" aria-label="' + st + ' dari 3 bintang">' + starSvg(st >= 1) + starSvg(st >= 2) + starSvg(st >= 3) + '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' + (pass ? '<span class="chip ok">Lolos target ' + t.target + ' benar</span>' : '<span class="chip bad">Belum mencapai target ' + t.target + ' benar</span>') + (res.timeout ? '<span class="chip warn">Waktu habis</span>' : '') + '</div></div></section>' +
+      '<div class="stats"><div class="stat ok"><b>' + res.correct + '</b><span>Benar</span></div><div class="stat bad"><b>' + res.wrong + '</b><span>Salah</span></div><div class="stat"><b>' + res.blank + '</b><span>Tidak dijawab</span></div><div class="stat"><b>' + fmtUsed(res.used) + '</b><span>Waktu dipakai</span></div></div>' +
+      '<div class="actions"><button class="btn btn-primary" data-act="intro" data-v="' + res.id + '">Ulangi Tes</button><button class="btn btn-ghost" data-act="home">Pilih Tes Lain</button></div>' +
+      '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Pembahasan</h2><div class="filter" role="group" aria-label="Filter pembahasan"><button data-act="revfilter" data-v="0" aria-pressed="' + !S.reviewAll + '">Salah & kosong</button><button data-act="revfilter" data-v="1" aria-pressed="' + S.reviewAll + '">Semua soal</button></div></div>' +
+      '<div class="review">' + reviewList(res, S.reviewAll) + '</div></section></div>';
+  }
+
+  function viewBetween() {
+    const prev = TESTS[ORDER[S.sim.idx - 1]], next = TESTS[S.pending];
+    return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="askexit">Keluar simulasi</button>') +
+      '<section class="card intro" style="padding:28px;gap:16px"><span class="chip ok" style="align-self:flex-start">Kategori ' + S.sim.idx + ' dari ' + ORDER.length + ' selesai</span><h1>' + esc(prev.name) + ' selesai</h1>' +
+      '<p class="muted">Jawaban sudah dikunci. Skor semua kategori ditampilkan setelah simulasi berakhir.</p>' +
+      '<div class="card" style="background:var(--chip);border:0"><span class="eyebrow">Berikutnya</span><h2 style="font-size:22px">' + esc(next.name) + '</h2><p class="muted">' + next.qs.length + ' soal · ' + next.minutes + ' menit · ' + esc(next.desc) + '</p></div>' +
+      '<div class="actions"><button class="btn btn-primary" data-act="intro" data-v="' + S.pending + '">Lanjut ke Petunjuk</button><button class="btn btn-ghost" data-act="askrestartsim">Ulangi Simulasi dari Awal</button></div></section></div>';
+  }
+
+  function viewSimResult() {
+    const rs = S.sim.results, cor = rs.reduce((a, r) => a + r.correct, 0), tot = rs.reduce((a, r) => a + r.total, 0), p = Math.round(cor / tot * 100), st = starsFor(p);
+    const passed = rs.filter(r => r.correct >= TESTS[r.id].target).length;
+    const rows = rs.map(r => { const t = TESTS[r.id], pp = Math.round(r.correct / r.total * 100), ok = r.correct >= t.target;
+      return '<tr><td>' + esc(t.name) + '</td><td class="num">' + r.correct + '/' + r.total + '</td><td class="num">' + pp + '%</td><td>' + (ok ? '<span class="chip ok">Lolos</span>' : '<span class="chip bad">Belum</span>') + '</td><td class="num">' + fmtUsed(r.used) + '</td></tr>'; }).join('');
+    const details = rs.map(r => { const t = TESTS[r.id], wrongN = r.total - r.correct;
+      return '<details class="sim-rev"><summary><span>' + esc(t.name) + '</span><span class="muted" style="font-weight:600">' + wrongN + ' soal salah/kosong</span></summary><div class="review">' + reviewList(r, false) + '</div></details>'; }).join('');
+    return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="home">Beranda</button>') +
+      '<section class="card score-card" style="padding:28px"><div class="ring">' + ringSvg(p) + '<div class="val"><b>' + cor + '/' + tot + '</b><span>' + p + '%</span></div></div>' +
+      '<div class="score-info"><span class="eyebrow">Hasil simulasi lengkap</span><h1>' + esc(levelFor(p)) + '</h1><div class="stars" aria-label="' + st + ' dari 3 bintang">' + starSvg(st >= 1) + starSvg(st >= 2) + starSvg(st >= 3) + '</div>' +
+      '<span class="chip ' + (passed === rs.length ? 'ok' : 'warn') + '" style="align-self:flex-start">' + passed + ' dari ' + rs.length + ' kategori lolos target</span></div></section>' +
+      '<div class="card"><div class="scroll-x"><table class="hist"><thead><tr><th>Kategori</th><th>Skor</th><th>%</th><th>Target</th><th>Waktu</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>' +
+      '<div class="actions"><button class="btn btn-primary" data-act="sim">Ulangi Simulasi</button><button class="btn btn-ghost" data-act="home">Beranda</button></div>' +
+      '<section style="display:flex;flex-direction:column;gap:12px"><div class="section-head"><h2>Soal yang salah per kategori</h2></div>' + details + '</section></div>';
+  }
+
+  function warteggSvg() {
+    const B = 100, G = 14, LH = 22;
+    const st = [
+      (x, y) => '<circle cx="' + (x + 50) + '" cy="' + (y + 50) + '" r="2.5" fill="currentColor"/>',
+      (x, y) => '<path d="M' + (x + 10) + ' ' + (y + 20) + 'q6 -8 11 0t11 0" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+      (x, y) => '<g stroke="currentColor" stroke-width="1.6"><line x1="' + (x + 17) + '" y1="' + (y + 86) + '" x2="' + (x + 17) + '" y2="' + (y + 76) + '"/><line x1="' + (x + 25) + '" y1="' + (y + 86) + '" x2="' + (x + 25) + '" y2="' + (y + 70) + '"/><line x1="' + (x + 33) + '" y1="' + (y + 86) + '" x2="' + (x + 33) + '" y2="' + (y + 64) + '"/></g>',
+      (x, y) => '<rect x="' + (x + 80) + '" y="' + (y + 9) + '" width="10" height="10" fill="currentColor"/>',
+      (x, y) => '<g stroke="currentColor" stroke-width="1.6"><line x1="' + (x + 10) + '" y1="' + (y + 90) + '" x2="' + (x + 31) + '" y2="' + (y + 69) + '"/><line x1="' + (x + 20) + '" y1="' + (y + 90) + '" x2="' + (x + 41) + '" y2="' + (y + 79) + '"/></g>',
+      (x, y) => '<g stroke="currentColor" stroke-width="1.6"><line x1="' + (x + 15) + '" y1="' + (y + 30) + '" x2="' + (x + 47) + '" y2="' + (y + 30) + '"/><line x1="' + (x + 75) + '" y1="' + (y + 42) + '" x2="' + (x + 75) + '" y2="' + (y + 82) + '"/></g>',
+      (x, y) => Array.from({ length: 9 }, (_, i) => '<circle cx="' + (x + 70 + 16 * Math.cos(Math.PI * i / 8)).toFixed(1) + '" cy="' + (y + 72 + 16 * Math.sin(Math.PI * i / 8)).toFixed(1) + '" r="1.5" fill="currentColor"/>').join(''),
+      (x, y) => '<path d="M' + (x + 12) + ' ' + (y + 48) + 'Q' + (x + 50) + ' ' + (y + 5) + ' ' + (x + 88) + ' ' + (y + 48) + '" fill="none" stroke="currentColor" stroke-width="1.6"/>'
+    ];
+    let out = '';
+    for (let k = 0; k < 8; k++) {
+      const x = (k % 4) * (B + G) + 2, y = Math.floor(k / 4) * (B + LH + G) + 2;
+      out += '<rect x="' + x + '" y="' + y + '" width="' + B + '" height="' + B + '" rx="3" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.2"/>' + st[k](x, y) +
+        '<text x="' + (x + 50) + '" y="' + (y + B + 16) + '" text-anchor="middle" font-size="11" font-family="Plus Jakarta Sans, sans-serif" fill="currentColor">Kotak ' + (k + 1) + '</text>';
+    }
+    const w = 4 * B + 3 * G + 4, h = 2 * (B + LH) + G + 4;
+    return '<svg class="wart" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Stimulus 8 kotak tes Wartegg">' + out + '</svg>';
+  }
+
+  function viewDrawIntro() {
+    const k = S.draw.id, t = DRAW[k];
+    return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="home">Kembali</button>') +
+      '<section class="card intro" style="padding:28px;gap:18px"><span class="eyebrow">Tes gambar · kerjakan di kertas</span><h1>' + esc(t.name) + '</h1>' +
+      '<div class="facts"><div class="fact"><b>' + t.minutes + ':00</b><span>menit</span></div><div class="fact"><b>A4</b><span>kertas polos</span></div><div class="fact"><b>' + t.check.length + '</b><span>poin checklist</span></div></div>' +
+      '<ol class="rules">' + t.steps.map(s => '<li>' + esc(s) + '</li>').join('') + '<li>Setelah waktu habis atau gambar selesai, nilai hasilmu dengan checklist.</li></ol>' +
+      (k === 'wartegg' ? '<div style="display:flex;justify-content:center">' + warteggSvg() + '</div>' : '') +
+      '<div class="actions"><button class="btn btn-primary" data-act="drawstart">Mulai Timer</button></div></section></div>';
+  }
+
+  function viewDrawRun() {
+    const t = DRAW[S.draw.id], rem = S.draw.endAt - Date.now(), warn = rem < 60000;
+    return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="askexit">Keluar</button>') +
+      '<section class="card intro" style="padding:32px;gap:20px;align-items:center;text-align:center"><span class="eyebrow">' + esc(t.name) + ' sedang berjalan</span>' +
+      '<div class="bigtimer' + (warn ? ' warn' : '') + '" id="timerTxt" role="timer">' + fmt(rem) + '</div><div class="timebar' + (warn ? ' warn' : '') + '" id="timebar" style="width:100%"><i style="width:' + Math.max(0, rem / (t.minutes * 60000) * 100).toFixed(2) + '%"></i></div>' +
+      '<p class="muted" style="max-width:52ch">' + esc(t.steps[0]) + '</p>' + (S.draw.id === 'wartegg' ? warteggSvg() : '') +
+      '<div class="actions" style="justify-content:center"><button class="btn btn-primary" data-act="drawdone">Selesai Menggambar</button><button class="btn btn-ghost" data-act="drawstart">Ulangi Timer</button></div></section></div>';
+  }
+
+  function viewDrawCheck() {
+    const t = DRAW[S.draw.id], d = S.draw;
+    const list = t.check.map((c, i) => '<label for="chk' + i + '"><input type="checkbox" id="chk' + i + '" data-chk="' + i + '" ' + (d.checked[i] ? 'checked' : '') + ' ' + (d.scored ? 'disabled' : '') + '><span>' + esc(c) + '</span></label>').join('');
+    let resHtml = '';
+    if (d.scored) {
+      const n = d.checked.filter(Boolean).length, p = Math.round(n / t.check.length * 100);
+      const missed = t.check.filter((c, i) => !d.checked[i]);
+      resHtml = '<div class="card" style="background:var(--chip);border:0"><span class="eyebrow">Hasil checklist</span><h2 style="font-size:24px">' + n + ' dari ' + t.check.length + ' poin terpenuhi</h2><div class="stars">' + starSvg(starsFor(p) >= 1) + starSvg(starsFor(p) >= 2) + starSvg(starsFor(p) >= 3) + '</div>' +
+        (missed.length ? '<p><b>Perbaiki di latihan berikutnya:</b></p><ul class="rules">' + missed.map(m => '<li>' + esc(m) + '</li>').join('') + '</ul>' : '<p>Semua poin terpenuhi. Pertahankan.</p>') + '</div>' +
+        '<div class="actions"><button class="btn btn-primary" data-act="drawintro" data-v="' + S.draw.id + '">Ulangi</button><button class="btn btn-ghost" data-act="home">Beranda</button></div>';
+    }
+    return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="home">Beranda</button>') +
+      '<section class="card intro" style="padding:28px;gap:16px"><span class="eyebrow">' + esc(t.name) + ' · penilaian diri</span><h1>' + (d.timeout ? 'Waktu habis' : 'Gambar selesai') + '</h1><p class="muted">Centang setiap poin yang terpenuhi pada gambarmu dengan jujur.</p>' +
+      '<div class="checklist">' + list + '</div>' + (d.scored ? resHtml : '<div class="actions"><button class="btn btn-primary" data-act="drawscore">Lihat Hasil</button></div>') + '</section></div>';
+  }
+
+  function viewModal() {
+    if (!S.modal) return '';
+    if (S.modal === 'finish') {
+      const c = counts();
+      return '<div class="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle"><div class="dialog"><h2 id="mTitle">Selesaikan kategori ini?</h2>' +
+        '<p class="muted">' + (c.empty ? 'Masih ada <b style="color:var(--danger)">' + c.empty + ' soal kosong</b>' : 'Semua soal sudah dijawab') + (c.ragu ? ' dan <b style="color:var(--ragu-text)">' + c.ragu + ' soal ditandai ragu</b>' : '') + '. Jawaban tidak bisa diubah setelah ini.</p>' +
+        '<div class="actions" style="justify-content:flex-end"><button class="btn btn-ghost" data-act="closemodal">Kembali ke soal</button><button class="btn btn-primary" data-act="finish">Ya, selesai</button></div></div></div>';
+    }
+    if (S.modal === 'restart') {
+      const t = TESTS[S.run.id];
+      return '<div class="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle"><div class="dialog"><h2 id="mTitle">Ulangi dari awal?</h2>' +
+        '<p class="muted">Semua jawaban di kategori ' + esc(t.name) + ' dihapus dan timer kembali ke ' + t.minutes + ':00.' + (S.sim ? ' Kamu juga bisa mengulang seluruh simulasi dari kategori pertama.' : '') + '</p>' +
+        '<div class="actions" style="justify-content:flex-end"><button class="btn btn-ghost" data-act="closemodal">Batal</button>' + (S.sim ? '<button class="btn btn-ghost" data-act="restartsim">Ulangi simulasi</button>' : '') + '<button class="btn btn-primary" data-act="restartcat">Ulangi kategori ini</button></div></div></div>';
+    }
+    if (S.modal === 'restartsim') {
+      return '<div class="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle"><div class="dialog"><h2 id="mTitle">Ulangi simulasi dari awal?</h2><p class="muted">Hasil kategori yang sudah selesai di simulasi ini dihapus, lalu simulasi dimulai lagi dari Deret Angka.</p>' +
+        '<div class="actions" style="justify-content:flex-end"><button class="btn btn-ghost" data-act="closemodal">Batal</button><button class="btn btn-primary" data-act="restartsim">Ya, ulangi</button></div></div></div>';
+    }
+    if (S.modal === 'reset') {
+      return '<div class="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle"><div class="dialog"><h2 id="mTitle">Reset riwayat dan skor?</h2><p class="muted">Riwayat terakhir dan skor terbaik semua tes di perangkat ini dihapus. Tindakan ini tidak bisa dibatalkan.</p>' +
+        '<div class="actions" style="justify-content:flex-end"><button class="btn btn-ghost" data-act="closemodal">Batal</button><button class="btn btn-primary" data-act="doreset" style="background:var(--danger)">Ya, reset</button></div></div></div>';
+    }
+    return '<div class="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle"><div class="dialog"><h2 id="mTitle">Keluar dari tes?</h2><p class="muted">Jawaban di sesi ini tidak disimpan dan tidak dinilai.</p>' +
+      '<div class="actions" style="justify-content:flex-end"><button class="btn btn-ghost" data-act="closemodal">Lanjutkan tes</button><button class="btn btn-primary" data-act="exit">Ya, keluar</button></div></div></div>';
+  }
+
+  function render() {
+    const v = S.view;
+    let html = v === 'intro' ? viewIntro() : v === 'exam' ? viewExam() : v === 'result' ? viewResult() : v === 'between' ? viewBetween() : v === 'simresult' ? viewSimResult() :
+      v === 'drawintro' ? viewDrawIntro() : v === 'drawrun' ? viewDrawRun() : v === 'drawcheck' ? viewDrawCheck() : viewHome();
+    html += viewModal();
+    if (S.toast) html += '<div class="toast" role="status">' + esc(S.toast) + '</div>';
+    app.innerHTML = html;
+  }
+
+  function showToast(msg) { S.toast = msg; render(); clearTimeout(toastT); toastT = setTimeout(() => { S.toast = ''; render(); }, 3200); }
+
+  function stopTick() { if (tick) { clearInterval(tick); tick = null; } }
+  function startTick() { stopTick(); tick = setInterval(onTick, 250); }
+  function onTick() {
+    let endAt, minutes;
+    if (S.view === 'exam' && S.run) { endAt = S.run.endAt; minutes = TESTS[S.run.id].minutes; }
+    else if (S.view === 'drawrun' && S.draw) { endAt = S.draw.endAt; minutes = DRAW[S.draw.id].minutes; }
+    else { stopTick(); return; }
+    const rem = endAt - Date.now();
+    if (rem <= 0) {
+      if (S.view === 'exam') { S.modal = null; finishTest(true); }
+      else { S.draw.timeout = true; S.view = 'drawcheck'; stopTick(); showToast('Waktu habis. Letakkan pensil.'); }
+      return;
+    }
+    const txt = document.getElementById('timerTxt'), bar = document.getElementById('timebar'), tm = document.getElementById('timer');
+    if (txt) { txt.textContent = fmt(rem); if (S.view === 'drawrun') txt.classList.toggle('warn', rem < 60000); }
+    if (tm) tm.classList.toggle('warn', rem < 60000);
+    if (bar) { bar.classList.toggle('warn', rem < 60000); const i = bar.querySelector('i'); if (i) i.style.width = Math.max(0, rem / (minutes * 60000) * 100).toFixed(2) + '%'; }
+  }
+
+  function startTest() {
+    const k = S.pending, t = TESTS[k];
+    const order = t.qs.map((_, i) => i);
+    if (S.shuffle) shuffleArr(order);
+    const now = Date.now();
+    S.run = { id: k, order, answers: {}, ragu: {}, cur: 0, startedAt: now, endAt: now + t.minutes * 60000 };
+    S.view = 'exam'; S.modal = null;
+    render(); startTick();
+  }
+
+  function finishTest(timeout) {
+    stopTick();
+    const r = S.run, t = TESTS[r.id];
+    const items = t.qs.map((q, i) => ({ i, q, chosen: r.answers[i] === undefined ? null : r.answers[i] }));
+    const correct = items.filter(x => x.chosen === x.q[2]).length, blank = items.filter(x => x.chosen === null).length;
+    const res = { id: r.id, items, total: items.length, correct, blank, wrong: items.length - correct - blank, used: Math.min(Date.now(), r.endAt) - r.startedAt, timeout: !!timeout };
+    record(r.id, t.name, correct, items.length);
+    S.run = null; S.modal = null; S.reviewAll = false;
+    if (S.sim) {
+      S.sim.results.push(res); S.sim.idx++;
+      if (S.sim.idx < ORDER.length) { S.pending = ORDER[S.sim.idx]; S.view = 'between'; }
+      else {
+        const cor = S.sim.results.reduce((a, x) => a + x.correct, 0), tot = S.sim.results.reduce((a, x) => a + x.total, 0);
+        record('simulasi', 'Simulasi lengkap', cor, tot);
+        S.view = 'simresult';
+      }
+    } else { S.result = res; S.view = 'result'; }
+    window.scrollTo(0, 0);
+    if (timeout) showToast('Waktu habis. Kategori otomatis diselesaikan.'); else render();
+  }
+
+  const act = {
+    home() { stopTick(); S.sim = null; S.run = null; S.draw = null; S.modal = null; S.view = 'home'; render(); window.scrollTo(0, 0); },
+    intro(v) { S.pending = v; S.view = 'intro'; render(); window.scrollTo(0, 0); },
+    sim() { S.sim = { idx: 0, results: [] }; S.pending = ORDER[0]; S.view = 'intro'; render(); window.scrollTo(0, 0); },
+    start() { startTest(); window.scrollTo(0, 0); },
+    pick(v) { const r = S.run; r.answers[r.order[r.cur]] = Number(v); render(); },
+    go(v) { S.run.cur = Number(v); render(); },
+    prev() { if (S.run.cur > 0) { S.run.cur--; render(); } },
+    next() { if (S.run.cur < S.run.order.length - 1) { S.run.cur++; render(); } },
+    ragu() { const r = S.run, qi = r.order[r.cur]; r.ragu[qi] = !r.ragu[qi]; render(); },
+    askfinish() { S.modal = 'finish'; render(); },
+    askexit() { S.modal = 'exit'; render(); },
+    askrestart() { S.modal = 'restart'; render(); },
+    askrestartsim() { S.modal = 'restartsim'; render(); },
+    askreset() { S.modal = 'reset'; render(); },
+    restartcat() { stopTick(); S.modal = null; startTest(); window.scrollTo(0, 0); showToast('Kategori diulang dari awal.'); },
+    restartsim() { stopTick(); S.run = null; S.modal = null; S.sim = { idx: 0, results: [] }; S.pending = ORDER[0]; S.view = 'intro'; render(); window.scrollTo(0, 0); },
+    doreset() { store.set({ best: {}, hist: [] }); S.modal = null; showToast('Riwayat dan skor terbaik sudah dihapus.'); },
+    closemodal() { S.modal = null; render(); },
+    finish() { finishTest(false); },
+    exit() { act.home(); },
+    revfilter(v) { S.reviewAll = v === '1'; render(); },
+    drawintro(v) { S.draw = { id: v }; S.view = 'drawintro'; render(); window.scrollTo(0, 0); },
+    drawstart() { S.draw.endAt = Date.now() + DRAW[S.draw.id].minutes * 60000; S.draw.checked = []; S.draw.scored = false; S.draw.timeout = false; S.view = 'drawrun'; render(); startTick(); },
+    drawdone() { stopTick(); S.view = 'drawcheck'; render(); },
+    drawscore() { S.draw.scored = true; const t = DRAW[S.draw.id]; record('draw-' + S.draw.id, t.name + ' (checklist)', S.draw.checked.filter(Boolean).length, t.check.length); render(); }
+  };
+
+  app.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]');
+    if (!b || b.disabled) return;
+    const fn = act[b.dataset.act];
+    if (fn) fn(b.dataset.v, b);
+  });
+  app.addEventListener('change', e => {
+    if (e.target.id === 'shuffle') S.shuffle = e.target.checked;
+    if (e.target.dataset && e.target.dataset.chk !== undefined && S.draw) { S.draw.checked[Number(e.target.dataset.chk)] = e.target.checked; }
+  });
+  document.addEventListener('keydown', e => {
+    if (S.view !== 'exam' || S.modal || e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea') return;
+    const k = e.key.toLowerCase();
+    const idx = ['a', 'b', 'c', 'd', 'e'].indexOf(k) >= 0 ? ['a', 'b', 'c', 'd', 'e'].indexOf(k) : ['1', '2', '3', '4', '5'].indexOf(k);
+    if (idx >= 0) { act.pick(idx); e.preventDefault(); }
+    else if (e.key === 'ArrowRight') { act.next(); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { act.prev(); e.preventDefault(); }
+  });
+
+  function boot(data) {
+    if (data && data.S) { S = Object.assign(S, data.S, { toast: '' }); }
+    render();
+    if ((S.view === 'exam' && S.run) || (S.view === 'drawrun' && S.draw)) startTick();
+  }
+  try { if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ S })); } catch (e) {}
+  if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(boot);
+  else boot((window.claude && window.claude.hot && window.claude.hot.data) || {});
+})();
+</script>
