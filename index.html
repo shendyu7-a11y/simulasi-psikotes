@@ -116,6 +116,27 @@ p { margin: 0; }
 .rev-q .figtitle { font-size: 15px; margin-bottom: 8px; }
 @media (max-width: 560px) { .opts.figgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .figseq .fig, .figq { width: 60px; height: 60px; } }
 
+/* Contoh soal */
+.examples { display: flex; flex-direction: column; gap: 14px; }
+.examples .section-head p { font-size: 14px; }
+.ex { border: 1.5px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; background: var(--surface); }
+.ex-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ex-q { font-size: 16px; font-weight: 600; }
+.ex .opt { min-height: 46px; padding: 10px 14px; }
+.ex .opt.is-right { border-color: var(--ok); background: var(--ok-soft); }
+.ex .opt.is-right .dot { border-color: var(--ok); }
+.ex .opt.is-right .dot::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--ok); }
+.ex .opt.is-wrong { border-color: var(--danger); background: var(--danger-soft); }
+.ex .opt.is-wrong .dot { border-color: var(--danger); }
+.ex .opt.is-wrong .dot::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); }
+.ex-verdict { font-weight: 700; }
+.ex-verdict.ok { color: var(--ok); }
+.ex-verdict.bad { color: var(--danger); }
+.ex-steps { font-size: 14px; background: var(--chip); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.ex-steps ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.ex-tip { font-size: 13px; color: var(--muted); }
+.ex-tip b { color: var(--ink); }
+
 /* Intro */
 .intro { max-width: 720px; margin: 0 auto; width: 100%; }
 .intro h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 800; letter-spacing: -0.02em; }
@@ -802,14 +823,99 @@ details.sim-rev .rev { border-color: var(--line); }
       '<section style="display:flex;flex-direction:column;gap:14px"><div class="section-head"><h2>Riwayat terakhir</h2>' + (d.hist.length ? '<button class="btn btn-ghost btn-sm" data-act="askreset">Reset riwayat &amp; skor</button>' : '') + '</div>' + hist + '</section>' + donasi() + '</div>';
   }
 
+
+  // ---- Contoh soal per subtes: [soal, opsi, indeks jawaban, langkah penjelasan[], tips, 'svg'?] ----
+  const EXAMPLES = {
+    deret: [
+      ['2, 5, 8, 11, 14, …', ['15', '16', '17', '18', '20'], 2,
+        ['Hitung selisih tiap pasangan angka: 5 − 2 = 3, 8 − 5 = 3, 11 − 8 = 3, 14 − 11 = 3.', 'Selisihnya selalu +3, jadi polanya ditambah 3.', 'Angka berikutnya: 14 + 3 = 17.'],
+        'Mulai dari yang paling sederhana: cek selisih (+/−), lalu kali/bagi, baru pola bertingkat.'],
+      ['5, 20, 7, 18, 9, 16, …, …', ['11, 14', '10, 14', '11, 15', '13, 14', '11, 12'], 0,
+        ['Selisihnya tidak teratur (+15, −13, +11, …), jadi curigai dua deret yang diselang-seling.', 'Suku ke-1, 3, 5: 5 → 7 → 9 (selalu +2). Berikutnya 9 + 2 = 11.', 'Suku ke-2, 4, 6: 20 → 18 → 16 (selalu −2). Berikutnya 16 − 2 = 14.', 'Dua titik kosong diisi berurutan: 11, lalu 14.'],
+        'Jika ada dua titik kosong, hampir selalu deretnya selang-seling. Pisahkan suku ganjil dan genap.']
+    ],
+    cerita: [
+      ['Harga 3 buku tulis Rp12.000. Berapa harga 5 buku tulis yang sama?', ['Rp15.000', 'Rp18.000', 'Rp20.000', 'Rp24.000', 'Rp25.000'], 2,
+        ['Cari harga satu buku: Rp12.000 ÷ 3 = Rp4.000.', 'Kalikan dengan jumlah yang ditanya: 5 × Rp4.000 = Rp20.000.'],
+        'Soal perbandingan senilai: makin banyak barang, makin besar harganya. Cari dulu nilai satuannya.'],
+      ['Sebuah pekerjaan selesai dalam 12 hari jika dikerjakan 6 orang. Jika dikerjakan 8 orang, berapa hari pekerjaan itu selesai?', ['8 hari', '9 hari', '10 hari', '14 hari', '16 hari'], 1,
+        ['Makin banyak pekerja, makin cepat selesai, jadi ini perbandingan berbalik nilai.', 'Hitung total beban kerja: 6 orang × 12 hari = 72 hari-orang.', 'Bagi dengan jumlah pekerja baru: 72 ÷ 8 = 9 hari.'],
+        'Jebakan umum: menjawab 16 hari karena memakai perbandingan senilai. Tanyakan dulu: kalau orang bertambah, waktunya naik atau turun?']
+    ],
+    logika: [
+      ['Semua pegawai wajib memakai seragam. Andi adalah pegawai. Kesimpulan yang tepat adalah …', ['Andi mungkin memakai seragam', 'Andi wajib memakai seragam', 'Andi tidak memakai seragam', 'Sebagian pegawai tidak berseragam', 'Tidak dapat disimpulkan'], 1,
+        ['Premis 1 berlaku untuk SEMUA pegawai tanpa kecuali.', 'Premis 2 menyatakan Andi termasuk pegawai.', 'Maka aturan semua pegawai juga berlaku untuk Andi: Andi wajib memakai seragam.', 'Jawaban "mungkin" salah karena kata "semua" membuatnya pasti.'],
+        'Gunakan hanya informasi di soal, bukan pengetahuan atau pendapat pribadi.'],
+      ['Ani lebih tinggi dari Budi. Citra lebih pendek dari Budi. Dedi lebih tinggi dari Ani. Siapa yang paling pendek?', ['Ani', 'Budi', 'Citra', 'Dedi', 'Tidak dapat ditentukan'], 2,
+        ['Tulis urutan dari setiap kalimat: Ani > Budi, Budi > Citra, Dedi > Ani.', 'Gabungkan menjadi satu baris: Dedi > Ani > Budi > Citra.', 'Yang paling pendek ada di ujung kanan: Citra.'],
+        'Untuk soal urutan, selalu coret-coret satu garis urutan di kertas buram.'],
+      ['Nilai kebenaran pernyataan berikut: Semua ikan bernapas dengan insang. Paus adalah ikan. Jadi, paus bernapas dengan insang.', PREMIS, 2,
+        ['Pernyataan pertama: ikan memang bernapas dengan insang, jadi benar.', 'Pernyataan kedua: paus adalah mamalia, bukan ikan, jadi salah.', 'Kesimpulan mengikuti kedua premis, tetapi premis keduanya keliru. Jawabannya: salah pada pernyataan kedua.'],
+        'Untuk tipe benar-salah, periksa setiap kalimat satu per satu dengan fakta umum, lalu cek apakah kesimpulannya mengikuti premis.']
+    ],
+    penalaran: [
+      [figQ([0, 45, 90, 135].map(arrowF)), [180, 225, 135, 90].map(arrowF), 0,
+        ['Bandingkan gambar 1 ke 2, 2 ke 3, dan 3 ke 4: panah selalu berputar 45° searah jarum jam.', 'Panah ke-4 menghadap kanan bawah. Diputar 45° lagi, panah menghadap ke bawah.', 'Pilihan A cocok. Pilihan C sama dengan gambar terakhir (belum berputar), jadi salah.'],
+        'Perhatikan satu hal yang berubah dulu: arah, jumlah, ukuran, warna, atau posisi.', 'svg'],
+      [figQ([1, 2, 3, 4].map(dotsF)), [4, 6, 5, 3].map(dotsF), 2,
+        ['Hitung titik di tiap kotak: 1, 2, 3, 4.', 'Setiap langkah bertambah satu titik.', 'Gambar berikutnya harus berisi 5 titik, yaitu pilihan C.'],
+        'Jika ada dua hal yang berubah (misalnya posisi dan warna), jawaban yang benar harus cocok untuk keduanya.', 'svg']
+    ],
+    analogi: [
+      ['Pena : Menulis = Pisau : …', ['Memotong', 'Dapur', 'Tajam', 'Besi'], 0,
+        ['Buat kalimat hubungan pasangan pertama: "Pena adalah alat untuk menulis".', 'Uji kalimat yang sama ke pisau: "Pisau adalah alat untuk …".', 'Yang cocok adalah memotong. Dapur (tempat), tajam (sifat), dan besi (bahan) hubungannya berbeda.'],
+        'Kalimat hubungan harus spesifik. "Pena berhubungan dengan menulis" terlalu umum dan membuat banyak pilihan terlihat benar.'],
+      ['Dokter : Pasien = Guru : …', ['Sekolah', 'Murid', 'Buku', 'Kepala sekolah'], 1,
+        ['Hubungan pasangan pertama: dokter melayani pasien.', 'Uji ke guru: guru melayani (mengajar) murid.', 'Sekolah adalah tempat kerja guru, jadi itu pola dokter : rumah sakit, bukan dokter : pasien.'],
+        'Pengecoh analogi biasanya kata yang memang berkaitan dengan soal, tetapi dengan jenis hubungan lain.']
+    ],
+    sinonim: [
+      ['Sinonim kata "Konstan" adalah …', ['Tetap', 'Cepat', 'Kuat', 'Sering', 'Lambat'], 0,
+        ['Konstan artinya tidak berubah, ajek.', 'Kata yang artinya sama adalah tetap.', '"Sering" adalah jebakan: berkaitan dengan frekuensi, tetapi artinya berbeda.'],
+        'Coba masukkan pilihan ke kalimat: "Kecepatannya konstan" = "Kecepatannya tetap". Kalimat tetap bermakna sama.'],
+      ['Sinonim kata "Probabilitas" adalah …', ['Kepastian', 'Kemungkinan', 'Percobaan', 'Perhitungan', 'Keberuntungan'], 1,
+        ['Probabilitas berarti peluang atau kemungkinan sesuatu terjadi.', 'Jawaban yang tepat: kemungkinan.', '"Kepastian" justru berlawanan makna, sedangkan "perhitungan" hanya cara menentukan probabilitas.'],
+        'Kerjakan cepat: sinonim dinilai dari kosakata, jangan terlalu lama di satu soal.']
+    ],
+    antonim: [
+      ['Lawan kata "Mutlak" adalah …', ['Pasti', 'Relatif', 'Absolut', 'Total', 'Tetap'], 1,
+        ['Mutlak artinya tidak terbatas atau tidak bergantung pada hal lain.', 'Lawannya adalah relatif (nisbi), yaitu bergantung pada sudut pandang atau keadaan.', '"Absolut" dan "pasti" adalah sinonim mutlak. Itu jebakan paling sering di tes antonim.'],
+        'Di tes antonim, biasanya ada sinonim di antara pilihan. Coret dulu yang maknanya sama.'],
+      ['Lawan kata "Rigid" adalah …', ['Kaku', 'Fleksibel', 'Kuat', 'Tegas', 'Rapuh'], 1,
+        ['Rigid artinya kaku, tidak mudah berubah atau dibengkokkan.', 'Lawannya adalah fleksibel (lentur, mudah menyesuaikan).', '"Kaku" adalah sinonim, bukan lawan kata.'],
+        'Jika ragu, ubah dulu kata sulit ke padanan sederhananya (rigid = kaku), lalu cari lawan katanya.']
+    ]
+  };
+  function viewExamples(k) {
+    const list = EXAMPLES[k]; if (!list) return '';
+    if (!S.ex || S.ex.id !== k) S.ex = { id: k, pick: {} };
+    return '<section class="examples"><div class="section-head"><h2>Contoh soal dan cara mengerjakan</h2><p class="muted">Coba jawab dulu, lalu baca penjelasannya. Contoh ini tidak dinilai.</p></div>' +
+      list.map((x, ei) => {
+        const svg = x[5] === 'svg', p = S.ex.pick[ei], shown = p !== undefined, okp = p === x[2];
+        const opts = x[1].map((o, i) => {
+          const cls = shown && i === x[2] ? ' is-right' : shown && i === p ? ' is-wrong' : '';
+          return '<button class="opt' + (svg ? ' figopt' : '') + cls + '" data-act="expick" data-v="' + ei + ':' + i + '"' + (svg ? ' aria-label="Pilihan ' + L[i] + '"' : '') + '><span class="dot"></span><span><b>' + L[i] + '.</b> ' + (svg ? o : esc(o)) + '</span></button>';
+        }).join('');
+        const verdict = !shown ? '' : p < 0 ? '<span class="ex-verdict">Jawaban: ' + L[x[2]] + '</span>' : okp ? '<span class="ex-verdict ok">Benar! Jawabannya ' + L[x[2]] + '.</span>' : '<span class="ex-verdict bad">Belum tepat. Jawaban yang benar ' + L[x[2]] + '.</span>';
+        return '<article class="ex"><div class="ex-head"><span class="chip">Contoh ' + (ei + 1) + '</span></div>' +
+          (svg ? '<div class="ex-q">' + x[0] + '</div>' : '<p class="ex-q">' + esc(x[0]) + '</p>') +
+          '<div class="opts' + (svg ? ' figgrid' : '') + '" role="group" aria-label="Pilihan contoh ' + (ei + 1) + '">' + opts + '</div>' +
+          (shown ? verdict + '<div class="ex-steps"><b>Cara mengerjakan</b><ol>' + x[3].map(st => '<li>' + esc(st) + '</li>').join('') + '</ol></div><p class="ex-tip"><b>Tips:</b> ' + esc(x[4]) + '</p>'
+            : '<div><button class="btn btn-ghost btn-sm" data-act="expick" data-v="' + ei + ':-1">Lihat jawaban dan penjelasan</button></div>') +
+          '</article>';
+      }).join('') + '</section>';
+  }
+
   function viewIntro() {
-    const k = S.pending, t = TESTS[k];
+    const k = S.pending, t = TESTS[k], nOpt = getQs(S.code, k)[0][1].length;
     const simInfo = S.sim ? '<span class="chip ok">Simulasi lengkap · kategori ' + (S.sim.idx + 1) + ' dari ' + ORDER.length + '</span>' : '';
     return '<div class="wrap">' + topbar('<button class="btn btn-ghost btn-sm" data-act="' + (S.sim ? 'askexit' : 'home') + '">' + (S.sim ? 'Keluar simulasi' : 'Kembali') + '</button>') +
       '<section class="card intro" style="padding:28px;gap:18px"><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">' + esc(codeLabel(S.code)) + '</span>' + simInfo + '</div><span class="eyebrow">Petunjuk kategori</span><h1>' + esc(t.name) + '</h1><p class="muted">' + esc(t.desc) + '</p>' +
       '<div class="facts"><div class="fact"><b>' + t.n + '</b><span>soal pilihan ganda</span></div><div class="fact"><b>' + t.minutes + ':00</b><span>menit waktu kerja</span></div><div class="fact"><b>' + t.target + '</b><span>target jawaban benar</span></div></div>' +
-      '<ol class="rules"><li>Pilih satu jawaban (A–E) di setiap soal. Jawaban bisa diubah selama waktu masih berjalan.</li><li>Pindah soal lewat tombol atau nomor soal di panel. Gunakan <b>Tandai Ragu</b> untuk soal yang ingin dicek ulang.</li><li>Benar atau salah tidak ditampilkan selama tes. Skor dan pembahasan muncul setelah kategori selesai.</li><li>Saat waktu habis, kategori otomatis selesai dan soal kosong dihitung salah.</li><li>Keyboard: tombol A–E atau 1–5 untuk memilih, panah kiri/kanan untuk pindah soal.</li></ol>' +
-      '<div class="actions"><button class="btn btn-primary" data-act="start">Mulai Tes</button></div></section></div>';
+      '<ol class="rules"><li>Pilih satu jawaban (A–' + (nOpt === 4 ? 'D' : 'E') + ') di setiap soal. Jawaban bisa diubah selama waktu masih berjalan.</li><li>Pindah soal lewat tombol atau nomor soal di panel. Gunakan <b>Tandai Ragu</b> untuk soal yang ingin dicek ulang.</li><li>Benar atau salah tidak ditampilkan selama tes. Skor dan pembahasan muncul setelah kategori selesai.</li><li>Saat waktu habis, kategori otomatis selesai dan soal kosong dihitung salah.</li><li>Keyboard: tombol A–' + (nOpt === 4 ? 'D atau 1–4' : 'E atau 1–5') + ' untuk memilih, panah kiri/kanan untuk pindah soal.</li></ol>' +
+      '<div class="actions"><button class="btn btn-primary" data-act="start">Mulai Tes</button></div></section>' +
+      viewExamples(k) +
+      '<section class="card" style="gap:12px"><p><b>Sudah paham polanya?</b> Waktu baru berjalan setelah kamu menekan Mulai Tes.</p><div class="actions"><button class="btn btn-primary" data-act="start">Mulai Tes</button></div></section></div>';
   }
 
   function counts() {
@@ -1052,6 +1158,7 @@ details.sim-rev .rev { border-color: var(--line); }
     intro(v) { S.pending = v; S.view = 'intro'; render(); window.scrollTo(0, 0); },
     sim() { S.sim = { idx: 0, results: [] }; S.pending = ORDER[0]; S.view = 'intro'; render(); window.scrollTo(0, 0); },
     start() { startTest(); window.scrollTo(0, 0); },
+    expick(v) { const [e, i] = String(v).split(':').map(Number); if (!S.ex) return; S.ex.pick[e] = i; render(); },
     pick(v) { const r = S.run; r.answers[r.order[r.cur]] = Number(v); render(); },
     go(v) { S.run.cur = Number(v); render(); },
     prev() { if (S.run.cur > 0) { S.run.cur--; render(); } },
