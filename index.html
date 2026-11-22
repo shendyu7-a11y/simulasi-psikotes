@@ -1,4 +1,4 @@
-<title>Trial Psikotest by Aa Shendi Yusuf</title>
+<title>Simulasi Psikotes by Aa Shendi Yusuf</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
@@ -191,6 +191,8 @@ p { margin: 0; }
 .rp-bar .actions { margin: 0; }
 .anon .btn { margin-top: 8px; }
 @media (max-width: 560px) { .report { padding: 18px 14px; } .rp-sum { flex-direction: column; align-items: flex-start; } .rp-meta dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rp-head { flex-direction: column; align-items: flex-start; } .rp-doc { text-align: left; } }
+
+.hero-use { font-weight: 600; color: var(--ink); }
 
 /* Contoh soal */
 .examples { display: flex; flex-direction: column; gap: 14px; }
@@ -879,7 +881,7 @@ details.sim-rev .rev { border-color: var(--line); }
     const recap = e.sim ? '<div class="rp-scroll"><table class="rp-tab rp-recap"><thead><tr><th>Subtes</th><th>Benar</th><th>Salah</th><th>Kosong</th><th>Nilai</th><th>Target</th></tr></thead><tbody>' +
       scores.map(s => '<tr><td>' + esc(TESTS[s.id].name) + '</td><td>' + s.correct + '/' + s.total + '</td><td>' + s.wrong + '</td><td>' + s.blank + '</td><td><b>' + s.pct + '%</b></td><td>' + (s.correct >= TESTS[s.id].target ? '<span class="rp-ok">Lolos</span>' : '<span class="rp-bad">Belum</span>') + '</td></tr>').join('') + '</tbody></table></div>' : '';
     return '<article class="report">' +
-      '<header class="rp-head"><div><div class="rp-brand">Trial Psikotest</div><div class="rp-by">by Aa Shendi Yusuf · 100% Gratis</div></div><div class="rp-doc"><b>Laporan Hasil Tes' + (e.sample ? '<span class="rp-sample">CONTOH</span>' : '') + '</b><span>' + esc(when) + '</span></div></header>' +
+      '<header class="rp-head"><div><div class="rp-brand">Simulasi Psikotes</div><div class="rp-by">by Aa Shendi Yusuf · 100% Gratis</div></div><div class="rp-doc"><b>Laporan Hasil Tes' + (e.sample ? '<span class="rp-sample">CONTOH</span>' : '') + '</b><span>' + esc(when) + '</span></div></header>' +
       '<section class="rp-sum"><div class="rp-score"><b>' + pct + '<small>%</small></b><span>' + cor + ' dari ' + tot + ' benar</span></div>' +
       '<div class="rp-meta"><h1>' + esc(title) + '</h1><p class="rp-level">Predikat: <b>' + (pct >= 90 ? 'Sangat baik' : pct >= 80 ? 'Baik' : pct >= 60 ? 'Cukup' : 'Perlu banyak latihan') + '</b>' + (passTxt ? ' · ' + esc(passTxt) : '') + '</p>' +
       '<dl><div><dt>Kode soal</dt><dd>' + esc(codeLabel(e.code)) + '</dd></div><div><dt>Benar</dt><dd>' + cor + '</dd></div><div><dt>Salah</dt><dd>' + (tot - cor - blank) + '</dd></div><div><dt>Kosong</dt><dd>' + blank + '</dd></div><div><dt>Waktu dipakai</dt><dd>' + (used ? fmtUsed(used) : '—') + '</dd></div></dl></div></section>' +
@@ -948,7 +950,7 @@ details.sim-rev .rev { border-color: var(--line); }
   const pdfIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 12v6M9 15l3 3 3-3"/></svg>';
   function donasi() {
     return '<section class="card"><div class="donasi-head"><span class="free-badge">100% Gratis</span><h2>Menerima open donasi</h2></div>' +
-      '<p class="muted">Trial Psikotest bisa dipakai gratis tanpa batas. Kalau latihan ini membantumu, kamu bisa berdonasi seikhlasnya lewat:</p>' +
+      '<p class="muted">Simulasi Psikotes bisa dipakai gratis tanpa batas. Kalau latihan ini membantumu, kamu bisa berdonasi seikhlasnya lewat:</p>' +
       '<div class="ewallet"><span class="chip">DANA</span><span class="chip">OVO</span><span class="chip">GoPay</span><span class="chip">Grab</span><span class="chip">ShopeePay</span></div>' +
       '<div class="donasi-no"><span class="no" id="donasiNo">0821-1256-9100</span><button class="btn btn-primary btn-sm" data-act="copyno">Salin nomor</button></div>' +
       '<p class="muted" style="font-size:13px">Pastikan nomor tujuan sudah benar sebelum mengirim.</p></section>' +
@@ -956,7 +958,7 @@ details.sim-rev .rev { border-color: var(--line); }
       '<p class="muted">Ada soal yang keliru, fitur yang kurang, atau ide subtes baru? Kabari lewat:</p>' +
       '<div class="contact-list">' +
       '<div class="contact"><span class="chip">Instagram</span><b>@_shndysfff</b><a class="btn btn-ghost btn-sm" href="https://www.instagram.com/_shndysfff/" target="_blank" rel="noopener">Buka Instagram</a></div>' +
-      '<div class="contact"><span class="chip">WhatsApp</span><b>0821-1256-9100</b><a class="btn btn-primary btn-sm" href="https://wa.me/6282112569100?text=' + encodeURIComponent('Halo, saya mau kasih kritik dan saran untuk Trial Psikotest: ') + '" target="_blank" rel="noopener">Chat WhatsApp</a></div>' +
+      '<div class="contact"><span class="chip">WhatsApp</span><b>0821-1256-9100</b><a class="btn btn-primary btn-sm" href="https://wa.me/6282112569100?text=' + encodeURIComponent('Halo, saya mau kasih kritik dan saran untuk Simulasi Psikotes: ') + '" target="_blank" rel="noopener">Chat WhatsApp</a></div>' +
       '</div></section>';
   }
   let S = { view: 'home', code: 1, shuffle: true, pending: null, run: null, result: null, sim: null, modal: null, reviewAll: false, draw: null, toast: '' };
@@ -977,7 +979,7 @@ details.sim-rev .rev { border-color: var(--line); }
   function shuffleArr(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
   function topbar(right) {
-    return '<header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">TP</div><div class="brand-text"><b>Trial Psikotest</b><span>by Aa Shendi Yusuf</span></div></div>' + (right || '') + '</header>';
+    return '<header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">SP</div><div class="brand-text"><b>Simulasi Psikotes</b><span>by Aa Shendi Yusuf</span></div></div>' + (right || '') + '</header>';
   }
 
   function viewHome() {
@@ -998,7 +1000,8 @@ details.sim-rev .rev { border-color: var(--line); }
       d.hist.map((h, hi) => '<tr><td>' + esc(new Date(h.t).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })) + '</td><td>' + esc(h.name) + (h.code ? ' <span class="muted">· ' + esc(codeLabel(h.code)) + '</span>' : '') + '</td><td class="num">' + h.correct + '/' + h.total + '</td><td class="num">' + Math.round(h.correct / h.total * 100) + '%</td><td>' + (h.rep ? '<button class="btn btn-ghost btn-sm" data-act="exportpdf" data-v="' + hi + '">Export PDF</button>' : '<span class="muted" title="Riwayat lama tanpa detail jawaban">—</span>') + '</td></tr>').join('') +
       '</tbody></table></div></div>' : '<div class="card"><p class="muted">Belum ada riwayat. Selesaikan satu subtes dan skornya akan muncul di sini, hanya di perangkat ini.</p></div>';
     return '<div class="wrap">' + topbar('<span class="chip">' + esc(today) + '</span>') +
-      '<section class="hero"><div class="hero-left"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="free-badge">100% Gratis</span><span class="eyebrow" style="color:var(--hero-muted)">Simulasi tes berbasis komputer</span></div><h1>Trial Psikotest<em>by Aa Shendi Yusuf</em></h1>' +
+      '<section class="hero"><div class="hero-left"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="free-badge">100% Gratis</span><span class="eyebrow" style="color:var(--hero-muted)">Latihan tes berbasis komputer</span></div><h1>Simulasi Psikotes<em>by Aa Shendi Yusuf</em></h1>' +
+      '<p class="hero-use">Psikotes ini umum digunakan dalam proses rekrutmen dan seleksi kerja, seperti saat melamar pekerjaan, seleksi BUMN, perusahaan swasta (BUMS), dan lainnya.</p>' +
       '<p>Kerjakan seperti tes sungguhan: ada batas waktu, bisa tandai ragu, dan jawaban baru dinilai setelah sesi berakhir. Skor dan soal yang salah muncul di akhir.</p>' +
       '<div class="actions"><button class="btn btn-primary" data-act="sim">Mulai Simulasi Lengkap</button></div></div>' +
       '<div class="hero-right"><div class="row"><span>Kode soal aktif</span><b>' + esc(codeLabel(S.code)) + '</b></div><div class="row"><span>Subtes</span><b>' + ORDER.length + '</b></div><div class="row"><span>Total soal</span><b>' + totalSoal + '</b></div><div class="row"><span>Total waktu</span><b>' + totalMin + ' menit</b></div>' +
