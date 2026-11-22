@@ -126,6 +126,12 @@ p { margin: 0; }
 .memo-note { font-size: 14px; color: var(--muted); }
 @media (max-width: 560px) { .memo-row { grid-template-columns: 1fr; gap: 2px; } }
 
+/* Kritik dan saran */
+.contact-list { display: flex; flex-direction: column; gap: 10px; }
+.contact { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 12px; }
+.contact b { font-family: var(--font-num); font-size: 16px; font-weight: 600; user-select: all; flex: 1 1 auto; min-width: 0; }
+.contact .chip { min-width: 92px; justify-content: center; }
+
 /* Contoh soal */
 .examples { display: flex; flex-direction: column; gap: 14px; }
 .examples .section-head p { font-size: 14px; }
@@ -826,7 +832,13 @@ details.sim-rev .rev { border-color: var(--line); }
       '<p class="muted">Trial Psikotest bisa dipakai gratis tanpa batas. Kalau latihan ini membantumu, kamu bisa berdonasi seikhlasnya lewat:</p>' +
       '<div class="ewallet"><span class="chip">DANA</span><span class="chip">OVO</span><span class="chip">GoPay</span><span class="chip">Grab</span><span class="chip">ShopeePay</span></div>' +
       '<div class="donasi-no"><span class="no" id="donasiNo">0821-1256-9100</span><button class="btn btn-primary btn-sm" data-act="copyno">Salin nomor</button></div>' +
-      '<p class="muted" style="font-size:13px">Pastikan nomor tujuan sudah benar sebelum mengirim.</p></section>';
+      '<p class="muted" style="font-size:13px">Pastikan nomor tujuan sudah benar sebelum mengirim.</p></section>' +
+      '<section class="card" style="gap:12px"><h2 style="font-size:18px;font-weight:800">Kritik dan saran</h2>' +
+      '<p class="muted">Ada soal yang keliru, fitur yang kurang, atau ide subtes baru? Kabari lewat:</p>' +
+      '<div class="contact-list">' +
+      '<div class="contact"><span class="chip">Instagram</span><b>@_shndysfff</b><a class="btn btn-ghost btn-sm" href="https://www.instagram.com/_shndysfff/" target="_blank" rel="noopener">Buka Instagram</a></div>' +
+      '<div class="contact"><span class="chip">WhatsApp</span><b>0821-1256-9100</b><a class="btn btn-primary btn-sm" href="https://wa.me/6282112569100?text=' + encodeURIComponent('Halo, saya mau kasih kritik dan saran untuk Trial Psikotest: ') + '" target="_blank" rel="noopener">Chat WhatsApp</a></div>' +
+      '</div></section>';
   }
   let S = { view: 'home', code: 1, shuffle: true, pending: null, run: null, result: null, sim: null, modal: null, reviewAll: false, draw: null, toast: '' };
   const app = document.getElementById('app');
