@@ -114,7 +114,14 @@ p { margin: 0; }
 .figinline .fig { width: 52px; height: 52px; vertical-align: middle; color: var(--ink); }
 .rev-q .figseq .fig, .rev-q .figq { width: 52px; height: 52px; }
 .rev-q .figtitle { font-size: 15px; margin-bottom: 8px; }
-@media (max-width: 560px) { .opts.figgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .figseq .fig, .figq { width: 60px; height: 60px; } }
+.figmat { display: grid; gap: 10px; width: max-content; max-width: 100%; }
+.figmat2 { grid-template-columns: repeat(2, 76px); }
+.figmat3 { grid-template-columns: repeat(3, 76px); }
+.figmat .fig, .figmat .figq { width: 76px; height: 76px; color: var(--ink); }
+.rev-q .figmat2 { grid-template-columns: repeat(2, 52px); }
+.rev-q .figmat3 { grid-template-columns: repeat(3, 52px); }
+.rev-q .figmat .fig, .rev-q .figmat .figq { width: 52px; height: 52px; }
+@media (max-width: 560px) { .opts.figgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .figseq .fig, .figq { width: 60px; height: 60px; } .figmat2 { grid-template-columns: repeat(2, 60px); } .figmat3 { grid-template-columns: repeat(3, 60px); } .figmat .fig, .figmat .figq { width: 60px; height: 60px; } }
 
 /* Hafalan kata */
 .memo-card { gap: 16px; }
@@ -174,6 +181,10 @@ p { margin: 0; }
 .rp-figq .figtitle { font-size: 11px; font-weight: 600; margin: 0 0 4px; }
 .rp-figq .figseq { display: flex; gap: 4px; flex-wrap: wrap; }
 .rp-figq .figseq .fig, .rp-figq .figq { width: 30px; height: 30px; font-size: 14px; }
+.rp-figq .figmat { gap: 4px; }
+.rp-figq .figmat2 { grid-template-columns: repeat(2, 30px); }
+.rp-figq .figmat3 { grid-template-columns: repeat(3, 30px); }
+.rp-figq .figmat .fig, .rp-figq .figmat .figq { width: 30px; height: 30px; font-size: 14px; }
 .rp-foot { margin-top: 18px; padding-top: 10px; border-top: 1px solid #E3E6EA; font-size: 10px; color: #5B6472; }
 @media print {
   @page { size: A4; margin: 12mm; }
@@ -478,7 +489,7 @@ details.sim-rev .rev { border-color: var(--line); }
     },
     penalaran: {
       name: 'Logika Penalaran (Gambar)', minutes: 20, target: 16, n: 20,
-      desc: 'Soal gambar: melanjutkan deret gambar, domino, analogi gambar, mencari gambar yang berbeda, bayangan cermin, dan urutan terbalik.',
+      desc: 'Soal gambar: melanjutkan deret gambar, domino, analogi gambar, mencari gambar yang berbeda, bayangan cermin, urutan terbalik, kesamaan gambar, dan matriks pola.',
       qs: null
     },
     analogi: {
@@ -967,6 +978,84 @@ details.sim-rev .rev { border-color: var(--line); }
     R => { const s = R.shuffle([0, 1, 2, 3, 4, 5, 6, 7]).slice(0, 5), rv = s.slice().reverse(), sw = (a, i, j) => { const b = a.slice(); const t = b[i]; b[i] = b[j]; b[j] = t; return b; }, other = [0, 1, 2, 3, 4, 5, 6, 7].find(x => !s.includes(x)); return { q: figAsk('Mana susunan yang urutannya terbalik (dibaca dari kanan ke kiri) dari susunan ini?', symF(s)), a: symF(rv), c: [symF(sw(rv, 0, 1)), symF(sw(rv, 2, 3)), symF(sw(rv, 1, 3)), symF(s), symF(rv.map((x, i) => i === 2 ? other : x))], e: 'Urutan dibaca dari belakang: simbol terakhir menjadi yang pertama.' }; }
   );
   function genPenalaran(R) { const out = []; for (const fn of R.shuffle(FGEN)) { if (out.length >= 20) break; const q = build(R, fn, 3, 'svg'); if (q) out.push(q); } return out; }
+
+  // ===== Soal gambar tambahan: kesamaan gambar dan matriks (pola orisinal) =====
+  const shapeIn = (s, f, k) => {
+    const st = (f ? 'fill="currentColor"' : 'fill="none"') + ' stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"';
+    const g = s === 'lingkaran' ? '<circle cx="30" cy="30" r="15" ' + st + '/>' : s === 'persegi' ? '<rect x="16" y="16" width="28" height="28" ' + st + '/>' : s === 'segitiga' ? '<path d="M30 14 L46 44 L14 44 Z" ' + st + '/>' : '<path d="M30 12 L48 30 L30 48 L12 30 Z" ' + st + '/>';
+    return '<g transform="translate(30 30) scale(' + k + ') translate(-30 -30)">' + g + '</g>';
+  };
+  const simQ = seq => '<p class="figtitle">Keempat gambar pertama memiliki satu kesamaan. Pilih gambar yang juga memiliki kesamaan itu.</p><div class="figseq">' + seq.join('') + '</div>';
+  const MQ = '<span class="figq" aria-hidden="true">?</span>';
+  const matQ = (cells, cols) => '<p class="figtitle">Perhatikan pola pada kotak-kotak berikut. Gambar mana yang tepat mengisi kotak yang kosong?</p><div class="figmat figmat' + cols + '">' + cells.join('') + '</div>';
+  const KS = [0.65, 0.8, 1];
+  const DOT_IN = [[30, 30], [26, 30], [34, 30], [30, 26], [30, 32]];
+  const dotsIn = (s, ps) => FIG(shapeIn(s, false, 1) + ps.map(p => '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.2" fill="currentColor"/>').join(''));
+  const dotsOnly = idx => FIG(idx.map(i => '<circle cx="' + DOTP[i][0] + '" cy="' + DOTP[i][1] + '" r="4.5" fill="currentColor"/>').join(''));
+  const polyRot = (m, rot, r) => FIG('<polygon points="' + Array.from({ length: m }, (_, i) => { const a = (rot + i * 360 / m) * Math.PI / 180; return (30 + r * Math.cos(a)).toFixed(1) + ',' + (30 + r * Math.sin(a)).toFixed(1); }).join(' ') + '" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>');
+  const dotRing = (m, f) => FIG(DOTP.slice(0, m).map(p => '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4.5" ' + (f ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="2"') + '/>').join(''));
+  FGEN.push(
+    // kesamaan: semua bangun berwarna hitam penuh
+    R => {
+      const T = R.shuffle(SHP), sz = R.shuffle([0.7, 0.85, 1, 0.75]);
+      const smp = T.map((s, i) => FIG(shapeIn(s, true, sz[i])));
+      const a = FIG(shapeIn(R.pick(SHP), true, R.pick(KS)));
+      const c = SHP.map(x => FIG(shapeIn(x, false, R.pick(KS)))).concat([FIG(shapeIn(R.pick(SHP), false, 1))]);
+      return { q: simQ(smp), a, c, e: 'Bentuk dan ukuran keempat gambar berbeda, tetapi semuanya berwarna hitam penuh. Hanya satu pilihan yang hitam penuh; pilihan lain kosong.' };
+    },
+    // kesamaan: tepat satu titik di dalam bangun
+    R => {
+      const T = R.shuffle(SHP), P = R.shuffle(DOT_IN);
+      const smp = T.map((s, i) => dotsIn(s, [P[i]]));
+      const s = R.pick(SHP);
+      const a = dotsIn(s, [R.pick(DOT_IN)]);
+      const out = R.pick([[8, 8], [52, 52], [8, 52], [52, 8]]);
+      const c = [dotsIn(R.pick(SHP), []), dotsIn(R.pick(SHP), [out]), dotsIn(R.pick(SHP), [DOT_IN[0], DOT_IN[3]]), dotsIn(R.pick(SHP), [R.pick(DOT_IN), out]), dotsIn(R.pick(SHP), [])];
+      return { q: simQ(smp), a, c, e: 'Setiap gambar berisi tepat satu titik di dalam bangun. Pilihan lain tidak memiliki titik, titiknya berada di luar bangun, atau jumlah titiknya bukan satu.' };
+    },
+    // kesamaan: jumlah titik sama, letak berbeda
+    R => {
+      const n = R.int(2, 5), sub = k => R.shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(0, k);
+      const smp = [0, 1, 2, 3].map(() => dotsOnly(sub(n)));
+      const a = dotsOnly(sub(n));
+      const c = [n - 1, n + 1, n + 2, n + 3, n - 2].filter(v => v >= 1 && v <= 9).map(v => dotsOnly(sub(v)));
+      return { q: simQ(smp), a, c, e: 'Letak titik berbeda-beda, tetapi setiap gambar berisi ' + n + ' titik. Hanya satu pilihan yang berisi ' + n + ' titik.' };
+    },
+    // kesamaan: jumlah sisi bangun sama
+    R => {
+      const n = R.int(3, 6), rots = R.shuffle([0, 15, 30, 45, 60, 75, 90, 105, 120]), rr = [14, 17, 19, 16, 18];
+      const smp = [0, 1, 2, 3].map(i => polyRot(n, rots[i], rr[i]));
+      const a = polyRot(n, rots[4], R.pick(rr));
+      const c = [n - 1, n + 1, n + 2, n + 3].filter(v => v >= 3 && v <= 8).map(v => polyRot(v, R.pick(rots), R.pick(rr)));
+      return { q: simQ(smp), a, c, e: 'Ukuran dan putaran berbeda-beda, tetapi setiap gambar berbentuk segi-' + n + ' (memiliki ' + n + ' sisi).' };
+    },
+    // matriks 2x2: bentuk berubah pada satu arah, warna dibalik pada arah lain
+    R => {
+      const T = R.shuffle(SHP), A = T[0], B = T[1], f0 = R.f() < 0.5, k = R.pick([0.8, 1]), across = R.f() < 0.5;
+      const cell = (s, f) => FIG(shapeIn(s, f, k));
+      const grid = across ? [cell(A, f0), cell(B, f0), cell(A, !f0), MQ] : [cell(A, f0), cell(A, !f0), cell(B, f0), MQ];
+      return { q: matQ(grid, 2), a: cell(B, !f0), c: [cell(B, f0), cell(A, !f0), cell(A, f0), cell(T[2], !f0), cell(T[3], !f0)], e: 'Bentuk berubah dari ' + A + ' menjadi ' + B + (across ? ' ke arah kanan' : ' ke arah bawah') + ', sedangkan warna dibalik ' + (across ? 'ke arah bawah' : 'ke arah kanan') + '. Kotak kosong berisi ' + B + ' dengan warna yang dibalik.' };
+    },
+    // matriks 2x2: jumlah bertambah satu pada satu arah, isi dibalik pada arah lain
+    R => {
+      const n = R.int(1, 5), f0 = R.f() < 0.5, across = R.f() < 0.5;
+      const grid = across ? [dotRing(n, f0), dotRing(n + 1, f0), dotRing(n, !f0), MQ] : [dotRing(n, f0), dotRing(n, !f0), dotRing(n + 1, f0), MQ];
+      return { q: matQ(grid, 2), a: dotRing(n + 1, !f0), c: [dotRing(n + 1, f0), dotRing(n, !f0), dotRing(n + 2, !f0), dotRing(n + 2, f0)].concat(n > 1 ? [dotRing(n - 1, !f0)] : []), e: 'Jumlah lingkaran bertambah satu ' + (across ? 'ke arah kanan' : 'ke arah bawah') + ', sedangkan isinya (hitam ↔ kosong) dibalik ' + (across ? 'ke arah bawah' : 'ke arah kanan') + '. Kotak kosong berisi ' + (n + 1) + ' lingkaran ' + (!f0 ? 'hitam' : 'kosong') + '.' };
+    },
+    // matriks 3x3: tiap baris dan kolom memuat tiga bentuk dan tiga ukuran, masing-masing sekali
+    R => {
+      const c1 = R.int(0, 2), c2 = R.int(0, 2), swp = R.f() < 0.5, SZ = [6, 10, 14], fl = R.f() < 0.5;
+      const m3 = v => ((v % 3) + 3) % 3;
+      const sh = (i, j) => m3((swp ? i + 2 * j : i + j) + c1), sz = (i, j) => m3((swp ? i + j : i + 2 * j) + c2);
+      const draw = (s, z) => FIG(shp(SH3[s], 30, 30, SZ[z], fl));
+      const cells = [];
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) cells.push(i === 2 && j === 2 ? MQ : draw(sh(i, j), sz(i, j)));
+      const c = [];
+      for (let s = 0; s < 3; s++) for (let z = 0; z < 3; z++) c.push(draw(s, z));
+      const NS = ['lingkaran', 'persegi', 'segitiga'], NZ = ['kecil', 'sedang', 'besar'];
+      return { q: matQ(cells, 3), a: draw(sh(2, 2), sz(2, 2)), c, e: 'Setiap baris dan kolom memuat tiga bentuk (lingkaran, persegi, segitiga) dan tiga ukuran (kecil, sedang, besar), masing-masing satu kali. Yang belum ada pada baris dan kolom terakhir adalah ' + NS[sh(2, 2)] + ' ukuran ' + NZ[sz(2, 2)] + '.' };
+    }
+  );
 
   // ===== Variasi tambahan: deret, cerita, logika, analogi, hafalan =====
   const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
